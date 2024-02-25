@@ -12,7 +12,7 @@ const createClient = (awsProfileName:string) => {
   return client;
 };
 
-const listBuildsOnce = async (client:unknown, buildIdsResult:string[], awsProfileName = 'default', codeBuildProjectName: string, nextToken?: string) => {
+const listBuildsOnce = async (client:unknown, buildIdsResult:string[], codeBuildProjectName: string, nextToken?: string) => {
   const input:ListBuildsForProjectCommandInput = {
     projectName: codeBuildProjectName,
     nextToken: nextToken,
@@ -31,7 +31,7 @@ const listBuildsOnce = async (client:unknown, buildIdsResult:string[], awsProfil
   }
 
   console.log(buildIdsResult.length);
-  if(nextToken) await listBuildsOnce(client, buildIdsResult, awsProfileName, codeBuildProjectName, nextToken);
+  if(nextToken) await listBuildsOnce(client, buildIdsResult, codeBuildProjectName, nextToken);
 }
 
 export const ListBuilds = async (awsProfileName = 'default', codeBuildProjectName: string):Promise<string[]> => {
@@ -39,6 +39,6 @@ export const ListBuilds = async (awsProfileName = 'default', codeBuildProjectNam
 
   console.log('実行開始')
   const buildIdsResult:string[] = [];
-  await listBuildsOnce(client, buildIdsResult, awsProfileName, codeBuildProjectName);
+  await listBuildsOnce(client, buildIdsResult, codeBuildProjectName);
   return buildIdsResult;
 };
