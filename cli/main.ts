@@ -1,3 +1,4 @@
+import { BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
 import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
 
@@ -26,8 +27,8 @@ for await (const entry of entries) {
   console.log(entry.value);
   const buildId:string = (entry.value as { buildId: string }).buildId;
 
-  const buildDetailEntry = await kv.get([`${codeBuildProjectName}__detail-response`, buildId])
-  if( buildDetailEntry.value === null || buildDetailEntry.value?.response === undefined) {
+  const buildDetailEntry:BatchGetBuildsCommandOutput = await kv.get([`${codeBuildProjectName}__detail-response`, buildId])
+  if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined) {
     console.log(`get build details: ${buildId}`);
     const response = await BatchGetBuilds(awsProfileName, buildId);
     await kv.set(
@@ -36,13 +37,20 @@ for await (const entry of entries) {
     );
     // rate limitに備えて0.1秒待つ
     await new Promise(resolve => setTimeout(resolve, 100));
-   } else {
+  } else {
      console.log('already exists');
   }
 }
 
-const buildDetailEntries = kv.list({prefix: [`${codeBuildProjectName}__detail-response`]})
+const buildDetailEntries = kv.list<BatchGetBuildsCommandOutput>({prefix: [`${codeBuildProjectName}__detail-response`]})
+const buildDetailsArray:BatchGetBuildsCommandOutput[] = [];
 for await (const entry of buildDetailEntries) {
-  console.log(entry.key);
-  if(entry.value !== undefined) console.log(entry.value);
+  buildDetailsArray.push(entry.value.response);
 }
+const buildDetailsArraySorted = buildDetailsArray.sort((a, b) => {
+  return a.builds[0].buildNumber - b.builds[0].buildNumber;
+});
+
+await Deno.writeTextFile(`./${codeBuildProjectName}.json`, JSON.stringify(buildDetailsArraySorted), {
+  append: false,
+});
