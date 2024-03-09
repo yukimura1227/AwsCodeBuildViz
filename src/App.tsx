@@ -12,19 +12,13 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
+import { unifyArray } from './lib/unifyArray';
 
 // yyyy-MM-dd形式の日付を取得
 const convertDateFormat = (date: Date) => {
   return new Date(date).toLocaleDateString("ja-JP", {year: "numeric", month: "2-digit", day: "2-digit"}).slice(0,10);
 }
 
-const unifyArray = (array:unknown[]) => {
-  const knownElements = new Set();
-  for (const value of array) {
-    knownElements.add(value);
-  }
-  return Array.from(knownElements);
-}
 
 const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
