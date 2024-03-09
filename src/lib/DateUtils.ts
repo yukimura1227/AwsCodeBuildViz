@@ -3,6 +3,10 @@ export const convertDateToDayString = (date: Date):string => {
   return dateToyyyyMMddWithHyphen(date).slice(0,10);
 }
 
+export const convertDateToMonthString = (date: Date):string => {
+  return dateToyyyyMMddWithHyphen(date).slice(0,7);
+}
+
 const dateToyyyyMMddWithHyphen = (date: Date):string => {
   return new Date(date).toLocaleDateString("ja-JP", {year: "numeric", month: "2-digit", day: "2-digit"});
 }

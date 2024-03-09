@@ -13,7 +13,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { unifyArray } from './lib/unifyArray';
-import { convertDateToDayString } from './lib/DateUtils';
+import { convertDateToDayString, convertDateToMonthString } from './lib/DateUtils';
 import { calculateAverage } from './lib/claculateAverage';
 
 const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
@@ -21,15 +21,19 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
     return a.builds![0].buildNumber! - b.builds![0].buildNumber!;
   });
 
-  const convertToLabel = (startTime:Date, convertType:"daily") => {
+  const groupingType:"daily"|"monthly" = "monthly";
+
+  const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
       return convertDateToDayString(startTime);
+    } else if(convertType === "monthly") {
+      return convertDateToMonthString(startTime);
     }
   }
 
   // labelsは、日付部分を抜粋してユニークな配列にする
   const labels = unifyArray(
-    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "daily") )
+    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, groupingType) )
   );
 
   console.log(labels);
@@ -39,7 +43,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       if (cur.durationInSeconds === undefined) return acc;
       return acc + cur.durationInSeconds!;
     }, 0);
-    return { label: convertToLabel(entry.builds![0].startTime!, "daily"), durationInSecondsSum };
+    return { label: convertToLabel(entry.builds![0].startTime!, groupingType), durationInSecondsSum };
   });
   console.log(codeBuildDateAndDurations);
 
