@@ -1,10 +1,10 @@
 import { CodeBuildClient, ListBuildsForProjectCommand, ListBuildsForProjectCommandInput, ListBuildsForProjectCommandOutput } from "npm:@aws-sdk/client-codebuild";
 import { fromSSO } from "npm:@aws-sdk/credential-providers";
 
-const createClient = (awsProfileName:string) => {
+const createClient = (awsProfileName:string,region:string) => {
   console.log(awsProfileName);
   const client = new CodeBuildClient({
-    region: "ap-northeast-1",
+    region: region,
     credentials: fromSSO({
       profile: awsProfileName,
     }),
@@ -34,8 +34,8 @@ const listBuildsOnce = async (client:unknown, buildIdsResult:string[], codeBuild
   if(nextToken) await listBuildsOnce(client, buildIdsResult, codeBuildProjectName, nextToken);
 }
 
-export const ListBuilds = async (awsProfileName = 'default', codeBuildProjectName: string):Promise<string[]> => {
-  const client = await createClient(awsProfileName);
+export const ListBuilds = async (awsProfileName = 'default', codeBuildProjectName: string, region: string):Promise<string[]> => {
+  const client = await createClient(awsProfileName, region);
 
   console.log('実行開始')
   const buildIdsResult:string[] = [];
