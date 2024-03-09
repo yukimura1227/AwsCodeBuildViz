@@ -15,8 +15,6 @@ import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-type
 import { unifyArray } from './lib/unifyArray';
 import { convertDateToDayString } from './lib/DateUtils';
 
-
-
 const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
     return a.builds![0].buildNumber! - b.builds![0].buildNumber!;
@@ -24,9 +22,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
 
   // labelsは、日付部分を抜粋してユニークな配列にする
   const labels = unifyArray(
-    sortedCodebuildData.map((entry) => {
-      return convertDateToDayString(entry.builds![0].startTime!);
-    })
+    sortedCodebuildData.map((entry) => convertDateToDayString(entry.builds![0].startTime!) )
   );
 
   console.log(labels);
