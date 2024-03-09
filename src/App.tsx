@@ -13,11 +13,8 @@ import {
 import { Line } from 'react-chartjs-2';
 import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { unifyArray } from './lib/unifyArray';
+import { convertDateToDayString } from './lib/DateUtils';
 
-// yyyy-MM-dd形式の日付を取得
-const convertDateFormat = (date: Date) => {
-  return new Date(date).toLocaleDateString("ja-JP", {year: "numeric", month: "2-digit", day: "2-digit"}).slice(0,10);
-}
 
 
 const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
@@ -28,7 +25,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   // labelsは、日付部分を抜粋してユニークな配列にする
   const labels = unifyArray(
     sortedCodebuildData.map((entry) => {
-      return convertDateFormat(entry.builds![0].startTime!);
+      return convertDateToDayString(entry.builds![0].startTime!);
     })
   );
 
@@ -39,7 +36,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       if (cur.durationInSeconds === undefined) return acc;
       return acc + cur.durationInSeconds!;
     }, 0);
-    return { date: convertDateFormat(entry.builds![0].startTime!), durationInSecondsSum };
+    return { date: convertDateToDayString(entry.builds![0].startTime!), durationInSecondsSum };
   });
   console.log(codeBuildDateAndDurations);
 
