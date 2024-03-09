@@ -14,6 +14,7 @@ import { Line } from 'react-chartjs-2';
 import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { unifyArray } from './lib/unifyArray';
 import { convertDateToDayString } from './lib/DateUtils';
+import { calculateAverage } from './lib/claculateAverage';
 
 const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
@@ -43,9 +44,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
     }).map((entry) => {
       return entry.durationInSecondsSum;
     });
-    return durations.reduce((acc, cur) => {
-      return acc + cur;
-    }, 0) / durations.length;
+    return calculateAverage(durations);
   });
 
   const options = {
