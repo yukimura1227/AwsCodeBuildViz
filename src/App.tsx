@@ -32,14 +32,14 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       if (cur.durationInSeconds === undefined) return acc;
       return acc + cur.durationInSeconds!;
     }, 0);
-    return { date: convertDateToDayString(entry.builds![0].startTime!), durationInSecondsSum };
+    return { label: convertDateToDayString(entry.builds![0].startTime!), durationInSecondsSum };
   });
   console.log(codeBuildDateAndDurations);
 
   // 日毎に平均を算出する
   const codeBuildDurations = labels.map((label) => {
     const durations = codeBuildDateAndDurations.filter((entry) => {
-      return entry.date === label;
+      return entry.label === label;
     }).map((entry) => {
       return entry.durationInSecondsSum;
     });
