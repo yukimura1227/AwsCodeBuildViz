@@ -21,9 +21,15 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
     return a.builds![0].buildNumber! - b.builds![0].buildNumber!;
   });
 
+  const convertToLabel = (startTime:Date, convertType:"daily") => {
+    if(convertType === "daily") {
+      return convertDateToDayString(startTime);
+    }
+  }
+
   // labelsは、日付部分を抜粋してユニークな配列にする
   const labels = unifyArray(
-    sortedCodebuildData.map((entry) => convertDateToDayString(entry.builds![0].startTime!) )
+    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "daily") )
   );
 
   console.log(labels);
@@ -33,7 +39,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       if (cur.durationInSeconds === undefined) return acc;
       return acc + cur.durationInSeconds!;
     }, 0);
-    return { label: convertDateToDayString(entry.builds![0].startTime!), durationInSecondsSum };
+    return { label: convertToLabel(entry.builds![0].startTime!, "daily"), durationInSecondsSum };
   });
   console.log(codeBuildDateAndDurations);
 
