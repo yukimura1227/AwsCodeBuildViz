@@ -116,17 +116,18 @@ const codeBuildResultJsons:BatchGetBuildsCommandOutput[][] = [];
 let settings = await import('../environment.local.json').then(module => module.default.codebuildSettings);
 if(!settings) settings = await import('../environment.json').then(module => module.default.codebuildSettings);
 
-settings.forEach( async (setting) => {
+for (const setting of settings) {
   console.log(`../codeBuildResult/${setting.codeBuildProjectName}.json`);
   codeBuildResultJsons.push(
     await import(`../codeBuildResult/${setting.codeBuildProjectName}.json`).then(module => module.default)
   );
-});
+}
 
 export const App = () => {
   return (
     <>
       {
+        codeBuildResultJsons &&
         codeBuildResultJsons.map((json, index) => {
           return Chart(json, `プロジェクト${index}`);
         })
