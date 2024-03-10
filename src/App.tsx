@@ -15,13 +15,16 @@ import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-type
 import { unifyArray } from './lib/unifyArray';
 import { convertDateToDayString, convertDateToMonthString } from './lib/DateUtils';
 import { calculateAverage } from './lib/claculateAverage';
+import { useState } from 'react';
 
-const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
+const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
     return a.builds![0].buildNumber! - b.builds![0].buildNumber!;
   });
 
-  const groupingType:"daily"|"monthly" = "monthly";
+  const GROUPING_TYPES = ["daily", "monthly"] as const;
+  type GroupingType = typeof GROUPING_TYPES[number];
+  const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
 
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
@@ -33,7 +36,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
 
   // labelsは、日付部分を抜粋してユニークな配列にする
   const labels = unifyArray(
-    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, groupingType) )
+    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, groupingTypeState) )
   );
 
   console.log(labels);
@@ -43,7 +46,7 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       if (cur.durationInSeconds === undefined) return acc;
       return acc + cur.durationInSeconds!;
     }, 0);
-    return { label: convertToLabel(entry.builds![0].startTime!, groupingType), durationInSecondsSum };
+    return { label: convertToLabel(entry.builds![0].startTime!, groupingTypeState), durationInSecondsSum };
   });
   console.log(codeBuildDateAndDurations);
 
@@ -88,7 +91,13 @@ const generateChart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   };
 
   return (
-    <Line options={options} data={data} />
+    <>
+      <label>Grouping</label>
+      <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
+        { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
+      </select>
+      <Line options={options} data={data} />
+    </>
   );
 }
 
@@ -119,7 +128,7 @@ export const App = () => {
     <>
       {
         codeBuildResultJsons.map((json, index) => {
-          return generateChart(json, `プロジェクト${index}`);
+          return Chart(json, `プロジェクト${index}`);
         })
       }
     </>
