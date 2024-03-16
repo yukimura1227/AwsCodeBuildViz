@@ -4,13 +4,12 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { unifyArray } from './lib/unifyArray';
 import { convertDateToDayString, convertDateToMonthString } from './lib/DateUtils';
@@ -98,7 +97,7 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
           { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
         </select>
       </div>
-      <Line options={options} data={data} />
+      <Bar options={options} data={data} />
     </>
   );
 }
@@ -106,8 +105,7 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
