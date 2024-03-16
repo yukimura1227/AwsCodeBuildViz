@@ -113,17 +113,21 @@ ChartJS.register(
   Legend
 );
 
-const codeBuildResultJsons:BatchGetBuildsCommandOutput[][] = [];
-
 let settings = await import('../environment.local.json').then(module => module.default.codebuildSettings);
 if(!settings) settings = await import('../environment.json').then(module => module.default.codebuildSettings);
+
+const codeBuildResultJsons:{ [key: string]: {
+  setting: typeof settings[0]
+  buildResult: BatchGetBuildsCommandOutput[]
+}} = {};
 
 await Promise.all(
   settings.map(async setting => {
     console.log(`../codeBuildResult/${setting.codeBuildProjectName}.json`);
-    codeBuildResultJsons.push(
-      await import(`../codeBuildResult/${setting.codeBuildProjectName}.json`).then(module => module.default)
-    );
+    codeBuildResultJsons[setting.codeBuildProjectName] = {
+      setting,
+      'buildResult': await import(`../codeBuildResult/${setting.codeBuildProjectName}.json`).then(module => module.default)
+    }
   })
 );
 
@@ -131,8 +135,12 @@ export const App = () => {
   return (
     <>
       {
-        codeBuildResultJsons.map((json, index) => {
-          return Chart(json, `プロジェクト${index}`);
+        Object.keys(codeBuildResultJsons)
+          .sort().reverse() // TODO: implements sort function
+          .map((key) =>
+        {
+          console.log(codeBuildResultJsons[key]);
+          return Chart(codeBuildResultJsons[key].buildResult, key);
         })
       }
     </>
