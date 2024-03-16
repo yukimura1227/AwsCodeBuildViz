@@ -93,9 +93,11 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   return (
     <>
       <label>Grouping</label>
-      <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
-        { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
-      </select>
+      <div className='selectbox'>
+        <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
+          { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
+        </select>
+      </div>
       <Line options={options} data={data} />
     </>
   );
