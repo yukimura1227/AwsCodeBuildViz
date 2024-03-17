@@ -48,23 +48,15 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   console.log(labels);
 
   const codeBuildLabelAndDurations = sortedCodebuildData.map((entry) => {
-
     const durations:{ [key in BuildPhaseTypeWithAllStringType]?: number} = {};
     buildPhaseTypeStrings.map((phaseType) => {
       const buildPhase = entry.builds![0].phases!.filter((value) => {
         return value.phaseType === phaseType
       })[0];
 
-      if(buildPhase?.durationInSeconds) durations[phaseType] = buildPhase.durationInSeconds;
+      durations[phaseType] = buildPhase?.durationInSeconds ?  buildPhase.durationInSeconds : 0;
     });
     console.log({durations});
-
-    // entry.builds![0].phasesのdurationInSecondを合計する
-    const durationInSecondsSum = entry.builds![0].phases!.reduce((acc, cur) => {
-      if (cur.durationInSeconds === undefined) return acc;
-      return acc + cur.durationInSeconds!;
-    }, 0);
-    durations["ALL"] = durationInSecondsSum;
 
     return {
       label: convertToLabel(entry.builds![0].startTime!, groupingTypeState),
@@ -74,16 +66,33 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   console.log({codeBuildLabelAndDurations});
 
   const codeBuildDurations = (target:BuildPhaseTypeWithAllStringType) => {
-    return labels.map((label) => {
-      const durations = codeBuildLabelAndDurations.filter((entry) => {
-        return entry.label === label;
-      }).map((entry) => {
-        return entry[target] || 0;
+    if('ALL' === target) {
+      return labels.map((label) => {
+          const durations = codeBuildLabelAndDurations.filter((entry) => {
+            return entry.label === label;
+          }).map((entry) => {
+            const durationInSecondsSum = buildPhaseTypeStrings.reduce( (sum, cur) => {
+              let durationInSeconds = 0;
+              if(entry[cur] !== undefined) {
+                durationInSeconds = entry[cur] as number;
+              }
+              return sum + durationInSeconds;
+            }, 0)
+            return durationInSecondsSum;
+          });
+          return calculateAverage(durations);
       });
-      return calculateAverage(durations);
-    })
+    } else {
+      return labels.map((label) => {
+        const durations = codeBuildLabelAndDurations.filter((entry) => {
+          return entry.label === label;
+        }).map((entry) => {
+          return entry[target] || 0;
+        });
+        return calculateAverage(durations);
+      })
+    }
   };
-  console.log(codeBuildDurations('ALL'));
 
   const options = {
     responsive: true,
