@@ -15,6 +15,7 @@ import { unifyArray } from './lib/unifyArray';
 import { convertDateToDayString, convertDateToMonthString } from './lib/DateUtils';
 import { calculateAverage } from './lib/claculateAverage';
 import { useState } from 'react';
+import { BuildPhaseType } from '@aws-sdk/client-codebuild';
 
 const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
@@ -24,6 +25,12 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const GROUPING_TYPES = ["daily", "monthly"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
+
+  type BuildPhaseTypeStringType = typeof buildPhaseTypeStrings[0];
+  type BuildPhaseTypeWithAllStringType = BuildPhaseTypeStringType | 'ALL';
+  const buildPhaseTypeStrings = Object.values(BuildPhaseType);
+  const buildPhaseTypeWithAllStrings = ['ALL', ...buildPhaseTypeStrings] as const;
+  const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeWithAllStringType>("ALL");
 
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
@@ -39,25 +46,44 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   );
 
   console.log(labels);
+
   const codeBuildDateAndDurations = sortedCodebuildData.map((entry) => {
+
+    const durations:{ [key in BuildPhaseTypeWithAllStringType]?: number} = {};
+    buildPhaseTypeStrings.map((phaseType) => {
+      const buildPhase = entry.builds![0].phases!.filter((value) => {
+        return value.phaseType === phaseType
+      })[0];
+
+      if(buildPhase?.durationInSeconds) durations[phaseType] = buildPhase.durationInSeconds;
+    });
+    console.log({durations});
+
     // entry.builds![0].phasesのdurationInSecondを合計する
     const durationInSecondsSum = entry.builds![0].phases!.reduce((acc, cur) => {
       if (cur.durationInSeconds === undefined) return acc;
       return acc + cur.durationInSeconds!;
     }, 0);
-    return { label: convertToLabel(entry.builds![0].startTime!, groupingTypeState), durationInSecondsSum };
-  });
-  console.log(codeBuildDateAndDurations);
+    durations["ALL"] = durationInSecondsSum;
 
-  // 日毎に平均を算出する
-  const codeBuildDurations = labels.map((label) => {
-    const durations = codeBuildDateAndDurations.filter((entry) => {
-      return entry.label === label;
-    }).map((entry) => {
-      return entry.durationInSecondsSum;
-    });
-    return calculateAverage(durations);
+    return {
+      label: convertToLabel(entry.builds![0].startTime!, groupingTypeState),
+      ...durations,
+    };
   });
+  console.log({codeBuildDateAndDurations});
+
+  const codeBuildDurations = (target:BuildPhaseTypeWithAllStringType) => {
+    return labels.map((label) => {
+      const durations = codeBuildDateAndDurations.filter((entry) => {
+        return entry.label === label;
+      }).map((entry) => {
+        return entry[target] || 0;
+      });
+      return calculateAverage(durations);
+    })
+  };
+  console.log(codeBuildDurations('ALL'));
 
   const options = {
     responsive: true,
@@ -74,6 +100,7 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       min: 0,
       max: 900,
       stepSize: 60,
+      stacked: true,
     },
   };
 
@@ -82,7 +109,7 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
     datasets: [
       {
         label: 'CodeBuildの実行時間',
-        data: codeBuildDurations,
+        data: codeBuildDurations(displayTargetBuildPhaseState),
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
       },
@@ -95,6 +122,12 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       <div className='selectbox'>
         <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
           { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
+        </select>
+      </div>
+      <label>TargetPhase</label>
+      <div className='selectbox'>
+        <select value={displayTargetBuildPhaseState} onChange={ e => setDisplayTargetBuildPhaseState(e.target.value as BuildPhaseTypeWithAllStringType)}>
+          { buildPhaseTypeWithAllStrings.map((phaseType) => <option value={phaseType}>{phaseType}</option>) }
         </select>
       </div>
       <Bar options={options} data={data} />
