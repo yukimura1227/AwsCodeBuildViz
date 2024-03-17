@@ -45,7 +45,7 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
     sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, groupingTypeState) )
   );
 
-  console.log(labels);
+  // console.log(labels);
 
   const codeBuildLabelAndDurations = sortedCodebuildData.map((entry) => {
     const durations:{ [key in BuildPhaseTypeWithAllStringType]?: number} = {};
@@ -56,14 +56,14 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
 
       durations[phaseType] = buildPhase?.durationInSeconds ?  buildPhase.durationInSeconds : 0;
     });
-    console.log({durations});
+    // console.log({durations});
 
     return {
       label: convertToLabel(entry.builds![0].startTime!, groupingTypeState),
       ...durations,
     };
   });
-  console.log({codeBuildLabelAndDurations});
+  // console.log({codeBuildLabelAndDurations});
 
   const codeBuildDurations = (target:BuildPhaseTypeWithAllStringType) => {
     if('ALL' === target) {
@@ -179,7 +179,7 @@ export const App = () => {
           .sort().reverse() // TODO: implements sort function
           .map((key) =>
         {
-          console.log(codeBuildResultJsons[key]);
+          // console.log(codeBuildResultJsons[key]);
           return Chart(codeBuildResultJsons[key].buildResult, key);
         })
       }
