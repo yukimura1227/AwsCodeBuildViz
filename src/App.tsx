@@ -32,6 +32,18 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const buildPhaseTypeWithAllStrings = ['ALL', ...buildPhaseTypeStrings] as const;
   const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeWithAllStringType>("ALL");
 
+  const colorsets:{ [key in BuildPhaseTypeStringType]?: {borderColor:string, backgroundColor:string}} = {};
+  buildPhaseTypeStrings.map( (type) => {
+    const randomRed:number   =  Math.floor(Math.random() * 255 + 1);
+    const randomGreen:number =  Math.floor(Math.random() * 255 + 1);
+    const randomBlue:number  =  Math.floor(Math.random() * 255 + 1);
+    colorsets[type] = {
+      borderColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue})`,
+      backgroundColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue}, 0.5)`,
+    };
+  });
+
+
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
       return convertDateToDayString(startTime);
@@ -65,33 +77,15 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   });
   // console.log({codeBuildLabelAndDurations});
 
-  const codeBuildDurations = (target:BuildPhaseTypeWithAllStringType) => {
-    if('ALL' === target) {
-      return labels.map((label) => {
-          const durations = codeBuildLabelAndDurations.filter((entry) => {
-            return entry.label === label;
-          }).map((entry) => {
-            const durationInSecondsSum = buildPhaseTypeStrings.reduce( (sum, cur) => {
-              let durationInSeconds = 0;
-              if(entry[cur] !== undefined) {
-                durationInSeconds = entry[cur] as number;
-              }
-              return sum + durationInSeconds;
-            }, 0)
-            return durationInSecondsSum;
-          });
-          return calculateAverage(durations);
+  const codeBuildDurations = (target:BuildPhaseTypeStringType) => {
+    return labels.map((label) => {
+      const durations = codeBuildLabelAndDurations.filter((entry) => {
+        return entry.label === label;
+      }).map((entry) => {
+        return entry[target] || 0;
       });
-    } else {
-      return labels.map((label) => {
-        const durations = codeBuildLabelAndDurations.filter((entry) => {
-          return entry.label === label;
-        }).map((entry) => {
-          return entry[target] || 0;
-        });
-        return calculateAverage(durations);
-      })
-    }
+      return calculateAverage(durations);
+    })
   };
 
   const options = {
@@ -113,16 +107,33 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
     },
   };
 
+  const generateDataSet = ( (displayTarget:BuildPhaseTypeWithAllStringType) => {
+    if(displayTarget === 'ALL') {
+      const datasets = buildPhaseTypeStrings.map( (type) => {
+        return {
+          label: type,
+          data: codeBuildDurations(type),
+          ...colorsets[type],
+        };
+      });
+      return datasets;
+    } else {
+      const randomRed:number   =  Math.floor(Math.random() * 255 + 1);
+      const randomGreen:number =  Math.floor(Math.random() * 255 + 1);
+      const randomBlue:number  =  Math.floor(Math.random() * 255 + 1);
+      const datasets = [{
+        label: displayTarget,
+        data: codeBuildDurations(displayTarget),
+        borderColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue})`,
+        backgroundColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue}, 0.5)`,
+      }];
+      return datasets;
+    }
+  });
+
   const data = {
     labels,
-    datasets: [
-      {
-        label: 'CodeBuildの実行時間',
-        data: codeBuildDurations(displayTargetBuildPhaseState),
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-    ],
+    datasets: generateDataSet(displayTargetBuildPhaseState),
   };
 
   return (
