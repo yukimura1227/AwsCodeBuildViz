@@ -17,6 +17,21 @@ import { calculateAverage } from './lib/claculateAverage';
 import { useState } from 'react';
 import { BuildPhaseType } from '@aws-sdk/client-codebuild';
 
+type BuildPhaseTypeStringType = typeof buildPhaseTypeStrings[0];
+type BuildPhaseTypeWithAllStringType = BuildPhaseTypeStringType | 'ALL';
+const buildPhaseTypeStrings = Object.values(BuildPhaseType);
+const buildPhaseTypeWithAllStrings = ['ALL', ...buildPhaseTypeStrings] as const;
+const colorsets:{ [key in BuildPhaseTypeStringType]?: {borderColor:string, backgroundColor:string}} = {};
+buildPhaseTypeStrings.map( (type) => {
+  const randomRed:number   =  Math.floor(Math.random() * 255 + 1);
+  const randomGreen:number =  Math.floor(Math.random() * 255 + 1);
+  const randomBlue:number  =  Math.floor(Math.random() * 255 + 1);
+  colorsets[type] = {
+    borderColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue})`,
+    backgroundColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue}, 0.5)`,
+  };
+});
+
 const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
     return a.builds![0].buildNumber! - b.builds![0].buildNumber!;
@@ -26,24 +41,7 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
 
-  type BuildPhaseTypeStringType = typeof buildPhaseTypeStrings[0];
-  type BuildPhaseTypeWithAllStringType = BuildPhaseTypeStringType | 'ALL';
-  const buildPhaseTypeStrings = Object.values(BuildPhaseType);
-  const buildPhaseTypeWithAllStrings = ['ALL', ...buildPhaseTypeStrings] as const;
-  const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeWithAllStringType>("ALL");
-
-  const colorsets:{ [key in BuildPhaseTypeStringType]?: {borderColor:string, backgroundColor:string}} = {};
-  buildPhaseTypeStrings.map( (type) => {
-    const randomRed:number   =  Math.floor(Math.random() * 255 + 1);
-    const randomGreen:number =  Math.floor(Math.random() * 255 + 1);
-    const randomBlue:number  =  Math.floor(Math.random() * 255 + 1);
-    colorsets[type] = {
-      borderColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue})`,
-      backgroundColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue}, 0.5)`,
-    };
-  });
-
-
+ const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeWithAllStringType>("ALL");
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
       return convertDateToDayString(startTime);
@@ -118,14 +116,10 @@ const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
       });
       return datasets;
     } else {
-      const randomRed:number   =  Math.floor(Math.random() * 255 + 1);
-      const randomGreen:number =  Math.floor(Math.random() * 255 + 1);
-      const randomBlue:number  =  Math.floor(Math.random() * 255 + 1);
       const datasets = [{
         label: displayTarget,
         data: codeBuildDurations(displayTarget),
-        borderColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue})`,
-        backgroundColor: `rgb(${randomRed}, ${randomGreen}, ${randomBlue}, 0.5)`,
+        ...colorsets[displayTarget],
       }];
       return datasets;
     }
