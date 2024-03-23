@@ -46,10 +46,21 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
     }
   }
 
-  // labelsは、日付部分を抜粋してユニークな配列にする
-  const labels = unifyArray(
-    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, groupingTypeState) )
-  );
+  const dailyLables   = unifyArray(
+    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "daily"))
+  ) as string[];
+  const monthlyLables = unifyArray(
+    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "monthly"))
+  ) as string[];
+  const detectLabels = (groupingType:GroupingType) => {
+    if(groupingType === "daily") {
+      return dailyLables;
+    } else if(groupingType === "monthly") {
+      return monthlyLables;
+    } else {
+      return monthlyLables;
+    }
+  };
 
   // console.log(labels);
 
@@ -72,7 +83,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
   // console.log({codeBuildLabelAndDurations});
 
   const codeBuildDurations = (target:BuildPhaseTypeStringType) => {
-    return labels.map((label) => {
+    return detectLabels(groupingTypeState).map((label) => {
       const durations = codeBuildLabelAndDurations.filter((entry) => {
         return entry.label === label;
       }).map((entry) => {
@@ -122,7 +133,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
   });
 
   const data = {
-    labels,
+    labels: detectLabels(groupingTypeState),
     datasets: generateDataSet(displayTargetBuildPhaseState),
   };
 
