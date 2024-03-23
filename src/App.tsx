@@ -32,11 +32,7 @@ buildPhaseTypeStrings.map( (type) => {
   };
 });
 
-const Chart = (json: BatchGetBuildsCommandOutput[], title:string) => {
-  const sortedCodebuildData = (json as BatchGetBuildsCommandOutput[]).sort((a, b) => {
-    return a.builds![0].buildNumber! - b.builds![0].buildNumber!;
-  });
-
+const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string) => {
   const GROUPING_TYPES = ["daily", "monthly"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
