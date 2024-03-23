@@ -18,9 +18,7 @@ import { useState } from 'react';
 import { BuildPhaseType } from '@aws-sdk/client-codebuild';
 
 type BuildPhaseTypeStringType = typeof buildPhaseTypeStrings[0];
-type BuildPhaseTypeWithAllStringType = BuildPhaseTypeStringType | 'ALL';
 const buildPhaseTypeStrings = Object.values(BuildPhaseType);
-const buildPhaseTypeWithAllStrings = ['ALL', ...buildPhaseTypeStrings] as const;
 const colorsets:{ [key in BuildPhaseTypeStringType]?: {borderColor:string, backgroundColor:string}} = {};
 buildPhaseTypeStrings.map( (type) => {
   const randomRed:number   =  Math.floor(Math.random() * 255 + 1);
@@ -37,7 +35,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
 
- const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeWithAllStringType>("ALL");
+ const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeStringType>("BUILD");
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
       return convertDateToDayString(startTime);
@@ -65,7 +63,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
   // console.log(labels);
 
   const codeBuildLabelAndDurations = sortedCodebuildData.map((entry) => {
-    const durations:{ [key in BuildPhaseTypeWithAllStringType]?: number} = {};
+    const durations:{ [key in BuildPhaseTypeStringType]?: number} = {};
     buildPhaseTypeStrings.map((phaseType) => {
       const buildPhase = entry.builds![0].phases!.filter((value) => {
         return value.phaseType === phaseType
@@ -112,24 +110,13 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
     },
   };
 
-  const generateDataSet = ( (displayTarget:BuildPhaseTypeWithAllStringType) => {
-    if(displayTarget === 'ALL') {
-      const datasets = buildPhaseTypeStrings.map( (type) => {
-        return {
-          label: type,
-          data: codeBuildDurations(type),
-          ...colorsets[type],
-        };
-      });
-      return datasets;
-    } else {
-      const datasets = [{
-        label: displayTarget,
-        data: codeBuildDurations(displayTarget),
-        ...colorsets[displayTarget],
-      }];
-      return datasets;
-    }
+  const generateDataSet = ( (displayTarget:BuildPhaseTypeStringType) => {
+    const datasets = [{
+      label: displayTarget,
+      data: codeBuildDurations(displayTarget),
+      ...colorsets[displayTarget],
+    }];
+    return datasets;
   });
 
   const data = {
@@ -147,8 +134,8 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
       </div>
       <label>TargetPhase</label>
       <div className='selectbox'>
-        <select value={displayTargetBuildPhaseState} onChange={ e => setDisplayTargetBuildPhaseState(e.target.value as BuildPhaseTypeWithAllStringType)}>
-          { buildPhaseTypeWithAllStrings.map((phaseType) => <option value={phaseType}>{phaseType}</option>) }
+        <select value={displayTargetBuildPhaseState} onChange={ e => setDisplayTargetBuildPhaseState(e.target.value as BuildPhaseTypeStringType)}>
+          { buildPhaseTypeStrings.map((phaseType) => <option value={phaseType}>{phaseType}</option>) }
         </select>
       </div>
       <Bar options={options} data={data} />
