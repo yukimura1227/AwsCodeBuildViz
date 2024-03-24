@@ -30,12 +30,24 @@ buildPhaseTypeStrings.map( (type) => {
   };
 });
 
-const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string) => {
+const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProjectName:string) => {
   const GROUPING_TYPES = ["daily", "monthly"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
 
- const [displayTargetBuildPhaseState, setDisplayTargetBuildPhaseState] = useState<BuildPhaseTypeStringType>("BUILD");
+  const initialCheckBoxes:{ [key in BuildPhaseTypeStringType]?: boolean} = {};
+  buildPhaseTypeStrings.map((phaseType) => {
+    initialCheckBoxes[phaseType] = true;
+  });
+  type DisplayTargetBuildPhasesStateType = typeof initialCheckBoxes;
+
+  const [displayTargetBuildPhasesState, setDisplayTargetBuildPhasesState] = useState<DisplayTargetBuildPhasesStateType>(initialCheckBoxes);
+
+  const reflectDisplayTarget = (phaseType:BuildPhaseTypeStringType, checked:boolean) => {
+    displayTargetBuildPhasesState[phaseType] = checked;
+    setDisplayTargetBuildPhasesState(Object.assign({}, displayTargetBuildPhasesState));
+  }
+
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
       return convertDateToDayString(startTime);
@@ -99,7 +111,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
       },
       title: {
         display: true,
-        text: title,
+        text: codeBuildProjectName,
       },
     },
     scale: {
@@ -110,18 +122,22 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
     },
   };
 
-  const generateDataSet = ( (displayTarget:BuildPhaseTypeStringType) => {
-    const datasets = [{
-      label: displayTarget,
-      data: codeBuildDurations(displayTarget),
-      ...colorsets[displayTarget],
-    }];
+  const generateDataSet = ( (displayTargetBuildPhasesStatedisplayTarget:DisplayTargetBuildPhasesStateType) => {
+    const datasets = buildPhaseTypeStrings.filter(
+      (buildPhase) => displayTargetBuildPhasesStatedisplayTarget[buildPhase]
+    ).map( (buildPhase) => {
+      return {
+        label: buildPhase,
+        data: codeBuildDurations(buildPhase),
+        ...colorsets[buildPhase],
+      }
+    });
     return datasets;
   });
 
   const data = {
     labels: detectLabels(groupingTypeState),
-    datasets: generateDataSet(displayTargetBuildPhaseState),
+    datasets: generateDataSet(displayTargetBuildPhasesState),
   };
 
   return (
@@ -132,11 +148,21 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], title:string)
           { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
         </select>
       </div>
-      <label>TargetPhase</label>
-      <div className='selectbox'>
-        <select value={displayTargetBuildPhaseState} onChange={ e => setDisplayTargetBuildPhaseState(e.target.value as BuildPhaseTypeStringType)}>
-          { buildPhaseTypeStrings.map((phaseType) => <option value={phaseType}>{phaseType}</option>) }
-        </select>
+      <div>
+        { buildPhaseTypeStrings.map(phaseType =>
+          <span key={phaseType}>
+            <input
+              id={`${codeBuildProjectName}-${phaseType}`}
+              type="checkbox"
+              value={phaseType}
+              checked={displayTargetBuildPhasesState[phaseType]}
+              onChange={ e => reflectDisplayTarget(e.target.value as BuildPhaseTypeStringType, e.target.checked)}
+            />
+            <label htmlFor={`${codeBuildProjectName}-${phaseType}`}>
+              {phaseType}
+            </label>
+          </span>
+        )}
       </div>
       <Bar options={options} data={data} />
     </>
