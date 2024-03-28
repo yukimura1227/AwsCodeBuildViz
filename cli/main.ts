@@ -3,8 +3,15 @@ import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
 import { fromIni, fromEnv } from "npm:@aws-sdk/credential-providers";
 
-let settings = await import('../environment.local.json', { with: { type: "json" } });
-if(!settings) settings = await import('../environment.json', { with: { type: "json" } });
+const localSettings = await import('../environment.local.json', { with: { type: "json" } });
+const globalSettings = await import('../environment.json', { with: { type: "json" } });
+
+let settings: typeof globalSettings | typeof localSettings;
+if(localSettings) {
+  settings = localSettings;
+} else {
+  settings = globalSettings;
+}
 
 settings.default.codebuildSettings.forEach( async (setting) => {
   const codeBuildProjectName:string = setting.codeBuildProjectName;
