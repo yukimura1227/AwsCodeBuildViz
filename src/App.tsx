@@ -39,14 +39,6 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
   buildPhaseTypeStrings.map((phaseType) => {
     initialCheckBoxes[phaseType] = true;
   });
-  type DisplayTargetBuildPhasesStateType = typeof initialCheckBoxes;
-
-  const [displayTargetBuildPhasesState, setDisplayTargetBuildPhasesState] = useState<DisplayTargetBuildPhasesStateType>(initialCheckBoxes);
-
-  const reflectDisplayTarget = (phaseType:BuildPhaseTypeStringType, checked:boolean) => {
-    displayTargetBuildPhasesState[phaseType] = checked;
-    setDisplayTargetBuildPhasesState(Object.assign({}, displayTargetBuildPhasesState));
-  }
 
   const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
     if(convertType === "daily") {
@@ -122,10 +114,8 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
     },
   };
 
-  const generateDataSet = ( (displayTargetBuildPhasesStatedisplayTarget:DisplayTargetBuildPhasesStateType) => {
-    const datasets = buildPhaseTypeStrings.filter(
-      (buildPhase) => displayTargetBuildPhasesStatedisplayTarget[buildPhase]
-    ).map( (buildPhase) => {
+  const generateDataSet = () => {
+    const datasets = buildPhaseTypeStrings.map( (buildPhase) => {
       return {
         label: buildPhase,
         data: codeBuildDurations(buildPhase),
@@ -133,11 +123,11 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
       }
     });
     return datasets;
-  });
+  };
 
   const data = {
     labels: detectLabels(groupingTypeState),
-    datasets: generateDataSet(displayTargetBuildPhasesState),
+    datasets: generateDataSet(),
   };
 
   return (
@@ -147,22 +137,6 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
         <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
           { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
         </select>
-      </div>
-      <div>
-        { buildPhaseTypeStrings.map(phaseType =>
-          <span key={phaseType}>
-            <input
-              id={`${codeBuildProjectName}-${phaseType}`}
-              type="checkbox"
-              value={phaseType}
-              checked={displayTargetBuildPhasesState[phaseType]}
-              onChange={ e => reflectDisplayTarget(e.target.value as BuildPhaseTypeStringType, e.target.checked)}
-            />
-            <label htmlFor={`${codeBuildProjectName}-${phaseType}`}>
-              {phaseType}
-            </label>
-          </span>
-        )}
       </div>
       <Bar options={options} data={data} />
     </>
