@@ -34,7 +34,8 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
   const GROUPING_TYPES = ["daily", "monthly"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
-  const [referenceDateState, setReferenceDateState] = useState("2024-01-01");
+  const [referenceDateFromState, setReferenceDateFromState] = useState("2024-01-01");
+  const [referenceDateToState, setReferenceDateToState] = useState(new Date().toISOString().slice(0,10));
 
   const initialCheckBoxes:{ [key in BuildPhaseTypeStringType]?: boolean} = {};
   buildPhaseTypeStrings.map((phaseType) => {
@@ -50,7 +51,8 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
   }
 
   const filteredCodebuildData = sortedCodebuildData.filter((entry) => {
-    return new Date(entry.builds![0].startTime!).getTime() >= new Date(referenceDateState).getTime();
+    const targetDateTime = new Date(entry.builds![0].startTime!).getTime();
+    return new Date(referenceDateFromState).getTime() <= targetDateTime && targetDateTime <= new Date(`${referenceDateToState}T23:59:59.999Z`).getTime();
   });
 
   const dailyLables   = unifyArray(
@@ -146,7 +148,11 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
         </span>
         <label className='filterLabel'>ReferenceDate </label>
         <span className='dateInputWrap'>
-          <input className='dateInput' type="date" value={referenceDateState} min="2022-01-01" max="2030-12-31" onChange={(e) => setReferenceDateState(e.target.value)} />
+          <input className='dateInput' type="date" value={referenceDateFromState} min="2022-01-01" max="2030-12-31" onChange={(e) => setReferenceDateFromState(e.target.value)} />
+        </span>
+        〜
+        <span className='dateInputWrap'>
+          <input className='dateInput' type="date" value={referenceDateToState} min="2022-01-01" max="2030-12-31" onChange={(e) => setReferenceDateToState(e.target.value)} />
         </span>
       </div>
       <Bar options={options} data={data} />
