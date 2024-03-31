@@ -34,6 +34,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
   const GROUPING_TYPES = ["daily", "monthly"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
+  const [referenceDateState, setReferenceDateState] = useState("2024-01-01");
 
   const initialCheckBoxes:{ [key in BuildPhaseTypeStringType]?: boolean} = {};
   buildPhaseTypeStrings.map((phaseType) => {
@@ -48,11 +49,15 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
     }
   }
 
+  const filteredCodebuildData = sortedCodebuildData.filter((entry) => {
+    return new Date(entry.builds![0].startTime!).getTime() >= new Date(referenceDateState).getTime();
+  });
+
   const dailyLables   = unifyArray(
-    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "daily"))
+    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "daily"))
   ) as string[];
   const monthlyLables = unifyArray(
-    sortedCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "monthly"))
+    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "monthly"))
   ) as string[];
   const detectLabels = (groupingType:GroupingType) => {
     if(groupingType === "daily") {
@@ -66,7 +71,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
 
   // console.log(labels);
 
-  const codeBuildLabelAndDurations = sortedCodebuildData.map((entry) => {
+  const codeBuildLabelAndDurations = filteredCodebuildData.map((entry) => {
     const durations:{ [key in BuildPhaseTypeStringType]?: number} = {};
     buildPhaseTypeStrings.map((phaseType) => {
       const buildPhase = entry.builds![0].phases!.filter((value) => {
@@ -133,11 +138,13 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
   return (
     <>
       <label>Grouping</label>
-      <div className='selectbox'>
+      <span className='selectbox'>
         <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
           { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
         </select>
-      </div>
+      </span>
+      <label>ReferenceDate</label>
+      <input type="date" value={referenceDateState} min="2022-01-01" max="2030-12-31" onChange={(e) => setReferenceDateState(e.target.value)} />
       <Bar options={options} data={data} />
     </>
   );
