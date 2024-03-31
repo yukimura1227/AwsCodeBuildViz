@@ -137,14 +137,18 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
 
   return (
     <>
-      <label>Grouping</label>
-      <span className='selectbox'>
-        <select value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
-          { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
-        </select>
-      </span>
-      <label>ReferenceDate</label>
-      <input type="date" value={referenceDateState} min="2022-01-01" max="2030-12-31" onChange={(e) => setReferenceDateState(e.target.value)} />
+      <div className='filterControls'>
+        <label className='filterLabel'>group by </label>
+        <span className=''>
+          <select className='groupingSlectbox' value={groupingTypeState} onChange={ e => setGroupingTypeState(e.target.value as GroupingType)}>
+            { GROUPING_TYPES.map((groupingType) => <option value={groupingType}>{groupingType}</option>) }
+          </select>
+        </span>
+        <label className='filterLabel'>ReferenceDate </label>
+        <span className='dateInputWrap'>
+          <input className='dateInput' type="date" value={referenceDateState} min="2022-01-01" max="2030-12-31" onChange={(e) => setReferenceDateState(e.target.value)} />
+        </span>
+      </div>
       <Bar options={options} data={data} />
     </>
   );
