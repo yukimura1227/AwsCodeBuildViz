@@ -1,6 +1,7 @@
 import { BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
 import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
+import { fromIni } from "npm:@aws-sdk/credential-providers";
 
 let settings = await import('../environment.local.json', { with: { type: "json" } });
 if(!settings) settings = await import('../environment.json', { with: { type: "json" } });
@@ -10,8 +11,10 @@ settings.default.codebuildSettings.forEach( async (setting) => {
   const codeBuildProjectName:string = setting.codeBuildProjectName;
   const region:string               = setting.region;
 
+  const credentials = fromIni({ profile: awsProfileName });
+
   const kv = await Deno.openKv();
-  const buildIds = await ListBuilds(awsProfileName, codeBuildProjectName, region);
+  const buildIds = await ListBuilds(credentials, codeBuildProjectName, region);
 
   console.log(buildIds);
 

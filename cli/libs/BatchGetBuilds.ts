@@ -1,13 +1,9 @@
 import { CodeBuildClient, BatchGetBuildsCommand, BatchGetBuildsCommandInput, BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
-import { fromSSO } from "npm:@aws-sdk/credential-providers";
 
-const createClient = (awsProfileName:string):CodeBuildClient => {
-  console.log(awsProfileName);
+const createClient = (credentials:unknown):CodeBuildClient => {
   const client = new CodeBuildClient({
     region: "ap-northeast-1",
-    credentials: fromSSO({
-      profile: awsProfileName,
-    }),
+    credentials: credentials,
   });
   return client;
 };

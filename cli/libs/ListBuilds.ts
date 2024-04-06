@@ -1,13 +1,9 @@
 import { CodeBuildClient, ListBuildsForProjectCommand, ListBuildsForProjectCommandInput, ListBuildsForProjectCommandOutput } from "npm:@aws-sdk/client-codebuild";
-import { fromSSO } from "npm:@aws-sdk/credential-providers";
 
-const createClient = (awsProfileName:string,region:string) => {
-  console.log(awsProfileName);
+const createClient = (credentials:unknown,region:string) => {
   const client = new CodeBuildClient({
     region: region,
-    credentials: fromSSO({
-      profile: awsProfileName,
-    }),
+    credentials: credentials,
   });
   return client;
 };
