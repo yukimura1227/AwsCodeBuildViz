@@ -1,8 +1,8 @@
 import { CodeBuildClient, BatchGetBuildsCommand, BatchGetBuildsCommandInput, BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
 
-const createClient = (credentials:unknown):CodeBuildClient => {
+const createClient = (credentials:unknown, region:string):CodeBuildClient => {
   const client = new CodeBuildClient({
-    region: "ap-northeast-1",
+    region: region,
     credentials: credentials,
   });
   return client;
@@ -21,8 +21,8 @@ const getButchBuild = async (client:CodeBuildClient, buildId:string):BatchGetBui
   return response;
 }
 
-export const BatchGetBuilds = async (awsProfileName = 'default', buildId:string) => {
-  const client = await createClient(awsProfileName);
+export const BatchGetBuilds = async (awsProfileName = 'default', buildId:string, region:string) => {
+  const client = await createClient(awsProfileName, region);
 
   return await getButchBuild(client, buildId);
 };
