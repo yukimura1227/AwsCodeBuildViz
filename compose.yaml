@@ -1,0 +1,22 @@
+services:
+  deno:
+    image: denoland/deno:1.41.2
+    volumes:
+      - .:/usr/src/app
+      - ~/.aws:/root/.aws:ro
+    environment:
+      - AWS_CONFIG_FILE=/root/.aws/config
+
+    working_dir: /usr/src/app/cli
+    command: 'deno run --unstable-kv --allow-sys --allow-env --allow-read --allow-net --allow-write main.ts'
+  node:
+    image: node:21.7.0-slim
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./:/usr/src/app
+    working_dir: /usr/src/app
+    command: >
+      /bin/sh -c
+      "npm install
+      && npm run dev"
