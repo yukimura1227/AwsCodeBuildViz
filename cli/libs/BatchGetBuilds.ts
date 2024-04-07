@@ -21,8 +21,8 @@ const getButchBuild = async (client:CodeBuildClient, buildId:string):BatchGetBui
   return response;
 }
 
-export const BatchGetBuilds = async (awsProfileName = 'default', buildId:string, region:string) => {
-  const client = await createClient(awsProfileName, region);
+export const BatchGetBuilds = async (credentials:unknown, buildId:string, region:string) => {
+  const client = await createClient(credentials, region);
 
   return await getButchBuild(client, buildId);
 };

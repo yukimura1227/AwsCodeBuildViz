@@ -30,8 +30,8 @@ const listBuildsOnce = async (client:unknown, buildIdsResult:string[], codeBuild
   if(nextToken) await listBuildsOnce(client, buildIdsResult, codeBuildProjectName, nextToken);
 }
 
-export const ListBuilds = async (awsProfileName = 'default', codeBuildProjectName: string, region: string):Promise<string[]> => {
-  const client = await createClient(awsProfileName, region);
+export const ListBuilds = async (credentials:unknown, codeBuildProjectName: string, region: string):Promise<string[]> => {
+  const client = await createClient(credentials, region);
 
   console.log('実行開始')
   const buildIdsResult:string[] = [];
