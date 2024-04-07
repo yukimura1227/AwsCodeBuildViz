@@ -1,17 +1,28 @@
 import { BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
 import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
-import { fromIni } from "npm:@aws-sdk/credential-providers";
+import { fromIni, fromEnv } from "npm:@aws-sdk/credential-providers";
 
 let settings = await import('../environment.local.json', { with: { type: "json" } });
 if(!settings) settings = await import('../environment.json', { with: { type: "json" } });
 
 settings.default.codebuildSettings.forEach( async (setting) => {
-  const awsProfileName:string       = setting.credentials.sso.awsProfileName;
   const codeBuildProjectName:string = setting.codeBuildProjectName;
   const region:string               = setting.region;
 
-  const credentials = fromIni({ profile: awsProfileName });
+  let credentials;
+  if( setting.credentials.sso?.awsProfileName ) {
+    const awsProfileName:string = setting.credentials.sso.awsProfileName;
+    credentials = fromIni({ profile: awsProfileName });
+  } else if( setting.credentials.accessToken ) {
+    Deno.env.set("AWS_ACCESS_KEY_ID", setting.credentials.accessToken?.AWS_ACCESS_KEY_ID);
+    Deno.env.set("AWS_SECRET_ACCESS_KEY", setting.credentials.accessToken?.AWS_SECRET_ACCESS_KEY);
+    Deno.env.set("AWS_SESSION_TOKEN", setting.credentials.accessToken?.AWS_SESSION_TOKEN);
+    credentials = fromEnv();
+  } else {
+    console.error('credentials not found');
+    Deno.exit(1);
+  }
 
   const kv = await Deno.openKv('./denoKVData/kv.sqlite3');
   const buildIds = await ListBuilds(credentials, codeBuildProjectName, region);
