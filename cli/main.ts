@@ -13,7 +13,7 @@ settings.default.codebuildSettings.forEach( async (setting) => {
 
   const credentials = fromIni({ profile: awsProfileName });
 
-  const kv = await Deno.openKv();
+  const kv = await Deno.openKv('./denoKVData/kv.sqlite3');
   const buildIds = await ListBuilds(credentials, codeBuildProjectName, region);
 
   console.log(buildIds);
