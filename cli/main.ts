@@ -37,7 +37,7 @@ settings.default.codebuildSettings.forEach( async (setting) => {
     const buildDetailEntry:BatchGetBuildsCommandOutput = await kv.get([`${codeBuildProjectName}__detail-response`, buildId])
     if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined) {
       console.log(`get build details: ${buildId}`);
-      const response = await BatchGetBuilds(awsProfileName, buildId, region);
+      const response = await BatchGetBuilds(credentials, buildId, region);
       await kv.set(
         [`${codeBuildProjectName}__detail-response`, buildId],
         { response },
