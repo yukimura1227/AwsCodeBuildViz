@@ -1,6 +1,15 @@
 {
   "codebuildSettings": [
     {
+      "credentials": {
+        "sso": {
+          "_comment": [
+            "If you use SSO, you can specify the profile name and the role name.",
+            "And adjust volume setting defined in compose.yaml."
+          ],
+          "awsProfileName": "your-aws-profile-name"
+        }
+      },
       "awsProfileName": "default",
       "region": "ap-northeast-1",
       "codeBuildProjectName": "my-codebuild-project"

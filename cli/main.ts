@@ -7,7 +7,7 @@ let settings = await import('../environment.local.json', { with: { type: "json" 
 if(!settings) settings = await import('../environment.json', { with: { type: "json" } });
 
 settings.default.codebuildSettings.forEach( async (setting) => {
-  const awsProfileName:string       = setting.awsProfileName;
+  const awsProfileName:string       = setting.credentials.sso.awsProfileName;
   const codeBuildProjectName:string = setting.codeBuildProjectName;
   const region:string               = setting.region;
 
