@@ -54,7 +54,7 @@ settings.default.codebuildSettings.forEach( async (setting) => {
         { response },
       );
       // rate limitに備えて0.1秒待つ
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       console.log('already exists');
     }
