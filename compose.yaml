@@ -3,6 +3,8 @@ services:
     image: denoland/deno:1.41.2
     volumes:
       - .:/usr/src/app
+
+      # if you use AWS SSO, you need mount your AWS credentials and set AWS_CONFIG_FILE environment variable
       - ~/.aws:/root/.aws:ro
     environment:
       - AWS_CONFIG_FILE=/root/.aws/config
