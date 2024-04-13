@@ -10,7 +10,6 @@
           "awsProfileName": "your-aws-profile-name"
         }
       },
-      "awsProfileName": "default",
       "region": "ap-northeast-1",
       "codeBuildProjectName": "my-codebuild-project"
     },
@@ -25,7 +24,6 @@
           "AWS_SESSION_TOKEN": ""
         }
       },
-      "awsProfileName": "default",
       "region": "ap-northeast-1",
       "codeBuildProjectName": "my-codebuild-project"
     }
