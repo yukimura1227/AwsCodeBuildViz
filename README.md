@@ -1,64 +1,123 @@
-# React + TypeScript + Vite
+# AwsCodeBuildViz
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Prerequisites
 
-Currently, two official plugins are available:
+Before you begin, ensure you have met the following requirements:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Docker** is installed on your system. (Recommended)
+- Alternatively, **Deno** can also be used.
 
-## Expanding the ESLint configuration
+This project is designed to be run within a Docker container for ease of setup and compatibility. However, for those who prefer, running directly with Deno is also supported.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Setting up for AWS CodeBuild Access
 
-- Configure the top-level `parserOptions` property like this:
+To access AWS CodeBuild, you need to set up your environment configuration files. Follow these steps:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+1. **Create a configuration file**: Copy the `environment.json` file and rename it to `environment.local.json`. We recommend using `environment.local.json` for your local environment as it is not tracked by git, ensuring your settings remain private.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+    ```bash
+    cp environment.json environment.local.json
+    ```
 
-## NOTE
+2. **Edit the `environment.local.json` file** with your specific AWS CodeBuild settings. This file will override the default settings provided in `environment.json` for your local environment.
 
-AWS CodeBuildの情報を取得するためのcliツールと、その結果を表示するwebのviewで構成されています。
+Using `environment.local.json` ensures that your custom configurations are kept out of version control, maintaining the security of your AWS access credentials.
 
-### 準備
+### CASE: using AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 
-CodeBuildの情報を取得するための設定を行います。
-
-environment.jsonまたは、environment.local.jsonを設定してください。
+Here is a specific example of how to configure your `environment.json` or `environment.local.json` for accessing AWS CodeBuild using AWS ACCESS KEY. This configuration includes the necessary credentials and project settings:
 
 ```json
 {
   "codebuildSettings": [
     {
-      "awsProfileName": "default",
+      "credentials": {
+        "accessToken": {
+          "AWS_ACCESS_KEY_ID": "your aws access key id",
+          "AWS_SECRET_ACCESS_KEY": "your secret access key",
+          "AWS_SESSION_TOKEN": "your session token" // Optional, only needed for temporary credentials
+        }
+      },
       "region": "ap-northeast-1",
-      "codeBuildProjectName": "my-codebuild-project"
+      "codeBuildProjectName": "your-codebuild-project"
     }
   ]
 }
 ```
 
-### CodeBuildの結果情報の取得
+Replace "your-aws-profile-name" with the name of your AWS CLI profile that is configured for SSO. Also, adjust "your-codebuild-project" to match the name of your AWS CodeBuild project and ensure the "region" is set to the AWS region where your CodeBuild project is located.
 
-```shell
-cd cli
-# 事前にaws cliにてssoでログインしている必要があります。
-AWS_PROFILE=AWSSSOLoginのProfile名 aws sso login
+This configuration leverages AWS SSO for a seamless and secure authentication process, avoiding the need to manage access keys directly. Ensure your AWS CLI is properly configured for SSO and that the profile name matches the one specified in your environment file.
+
+### Aggregate AWS CodeBuild Results
+
+### CASE: using AWS SSO
+
+For those who prefer to use AWS SSO for authentication, configure your `environment.json` or `environment.local.json` with the following structure to access AWS CodeBuild:
+
+```json
+{
+  "codebuildSettings": [
+    {
+      "credentials": {
+        "sso": {
+          "awsProfileName": "your-aws-profile-name"
+        }
+      },
+      "region": "ap-northeast-1",
+      "codeBuildProjectName": "your-codebuild-project"
+    }
+  ]
+}
+```
+
+## Aggregating AWS CodeBuild Results
+
+Upon execution, this project efficiently aggregates AWS CodeBuild results, utilizing Deno.KV for caching. After the initial run, subsequent executions will fetch and aggregate only the differences, thanks to the cached data. This ensures faster processing by retrieving only new or changed build results.
+Executing the command below runs then aggregates the AWS CodeBuild results and saves them in the `codeBuildResult/` directory.
+
+Depending on your setup, you can aggregate the results of AWS CodeBuild using either Docker or Deno. Here's how:
+
+### Using Docker
+
+If you're using Docker, run the following command to aggregate the results:
+
+```bash
+# using AWS_ACCESS_KEY_ID
+docker compose run --rm cli
+```
+
+```bash
+# using AWS SSO
+AWS_PROFILE=your-profile-name aws sso login
+docker compose -f compose.yaml -f compose.sso.yaml run --rm cli
+```
+
+### Using Deno Directly
+
+For those who prefer or need to use Deno directly, run the following command:
+
+```bash
+cd cli/
 deno run --unstable-kv --allow-sys --allow-env --allow-read --allow-net --allow-write main.ts
 ```
 
-上記を実行することで、AWS CodeBuildの実行結果をcodeBuildResult/に保存します。
-各ビルド結果は、Deno.KV上にキャッシュされるため、二回目移行の実行は、キャッシュがヒットしない差分だけ取得します。
+## Viewing Aggregated Results
+
+After aggregating the AWS CodeBuild results, you can view them by following these steps:
+
+### Using Docker
+
+If you used Docker to aggregate the results, run the following command to start the visualization tool.
+Run the following command to start the visualization tool and access the aggregated results at http://localhost:5173
+
+```bash
+docker compose up viz
+```
+
+### Using Deno Directly
+
+```bash
+cd web/
+deno task dev
+```
