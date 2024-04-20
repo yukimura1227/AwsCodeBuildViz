@@ -1,5 +1,22 @@
 # AwsCodeBuildViz
 
+## Overview
+
+AwsCodeBuildViz is a tool designed to enhance the visibility and analysis of AWS CodeBuild projects. It offers a comprehensive suite of features aimed at simplifying the monitoring and optimization of build processes. Key features include:
+
+- **Result Collection**: Aggregates AWS CodeBuild results for easy access and analysis. Once results are collected, they are cached to enable efficient differential collection on subsequent runs.
+- **Graphical Representation**: Visualizes AWS CodeBuild execution times by phase in graphical format, providing clear insights into the build process.
+- **Flexible Viewing Options**: Allows users to switch between monthly and daily views for targeted analysis.
+- **Customizable Time Periods**: Enables users to freely select the time period for which they want to view build data, offering tailored insights according to specific needs.
+
+With AwsCodeBuildViz, teams can easily track and optimize their AWS CodeBuild projects, ensuring a smoother and more efficient development cycle.
+
+![overview](https://github.com/yukimura1227/AwsCodeBuildViz/blob/main/docs/AwsCodeBuildBiz.gif)
+
+## Architecture
+
+![architecture](https://github.com/yukimura1227/AwsCodeBuildViz/blob/main/docs/architecture.drawio.svg)
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
