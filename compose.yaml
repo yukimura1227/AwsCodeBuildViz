@@ -1,5 +1,5 @@
 services:
-  deno:
+  cli:
     image: denoland/deno:1.41.2
     volumes:
       - .:/usr/src/app
