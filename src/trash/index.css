@@ -11,11 +11,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  height: 100%;
-  width: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -70,55 +66,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
-
-.filterControls {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-.filterLabel {
-  font-size: 1.2rem;
-  color: #999;
-}
-
-.groupingSlectbox {
-  padding: 0 .5rem;
-  width: 12rem;
-  height: 2rem;
-  border: 1px solid #DDD;
-  box-sizing: border-box;
-  font-size: 1rem;
-  color: #999;
-}
-
-.dateInput {
-  padding: 0 .5rem;
-  width: 12rem;
-  height: 2rem;
-  border: 1px solid #DDD;
-  background: transparent;
-  box-sizing: border-box;
-  font-size: 1rem;
-  color: #999;
-}
-
-.dateInput::-webkit-inner-spin-button{
-  -webkit-appearance: none;
-}
-.dateInput::-webkit-clear-button{
-  -webkit-appearance: none;
-}
-
-.dateInpu::-webkit-calendar-picker-indicator{
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 0, 0, 0.5);
-  color: transparent;
-  cursor: pointer;
 }

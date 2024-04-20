@@ -3,22 +3,27 @@ services:
     image: denoland/deno:1.41.2
     volumes:
       - .:/usr/src/app
+      - deno_node_modules_for_cli:/usr/src/app/cli/node_modules
 
       # if you use AWS SSO, you need mount your AWS credentials and set AWS_CONFIG_FILE environment variable
       - ~/.aws:/root/.aws:ro
+
     environment:
       - AWS_CONFIG_FILE=/root/.aws/config
 
     working_dir: /usr/src/app/cli
     command: 'deno run --unstable-kv --allow-sys --allow-env --allow-read --allow-net --allow-write main.ts'
-  node:
-    image: node:21.7.0-slim
+  viz:
+    image: denoland/deno:1.41.2
     ports:
       - '5173:5173'
     volumes:
       - ./:/usr/src/app
-    working_dir: /usr/src/app
+      - deno_node_modules_for_viz:/usr/src/app/web/node_modules
+    working_dir: /usr/src/app/web
     command: >
       /bin/sh -c
-      "npm install
-      && npm run dev"
+      "deno task dev"
+volumes:
+  deno_node_modules_for_cli:
+  deno_node_modules_for_viz:
