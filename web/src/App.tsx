@@ -108,6 +108,11 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
     plugins: {
       legend: {
         position: 'right' as const,
+        labels: {
+          font: {
+            size: '10',
+          }
+        }
       },
       title: {
         display: true,
