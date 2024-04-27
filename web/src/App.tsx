@@ -110,7 +110,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
         position: 'right' as const,
         labels: {
           font: {
-            size: '10',
+            size: 10,
           }
         }
       },
