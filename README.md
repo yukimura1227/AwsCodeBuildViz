@@ -11,7 +11,7 @@ AwsCodeBuildViz is a tool designed to enhance the visibility and analysis of AWS
 
 With AwsCodeBuildViz, teams can easily track and optimize their AWS CodeBuild projects, ensuring a smoother and more efficient development cycle.
 
-![overview](https://github.com/yukimura1227/AwsCodeBuildViz/blob/main/docs/AwsCodeBuildBiz.gif)
+![overview](https://github.com/yukimura1227/AwsCodeBuildViz/blob/main/docs/AwsCodeBuildViz.gif)
 
 ## Architecture
 
