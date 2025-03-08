@@ -73,7 +73,10 @@ settings.default.codebuildSettings.forEach( async (setting) => {
     buildDetailsArray.push(entry.value.response);
   }
   const buildDetailsArraySorted = buildDetailsArray.sort((a, b) => {
-    return a.builds[0].buildNumber - b.builds[0].buildNumber;
+    if (a.builds && b.builds) {
+      return (a.builds?.[0]?.buildNumber ?? 0) - (b.builds?.[0]?.buildNumber ?? 0);
+    }
+    return 0;
   });
 
   await Deno.writeTextFile(`../codeBuildResult/${codeBuildProjectName}.json`, JSON.stringify(buildDetailsArraySorted), {
