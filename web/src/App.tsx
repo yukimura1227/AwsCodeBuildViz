@@ -32,7 +32,7 @@ buildPhaseTypeStrings.map( (type) => {
 });
 
 const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProjectName:string) => {
-  const GROUPING_TYPES = ["daily", "monthly"] as const;
+  const GROUPING_TYPES = ["daily", "monthly", "none"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
   const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
   const [referenceDateFromState, setReferenceDateFromState] = useState("2024-01-01");
@@ -43,11 +43,15 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
     initialCheckBoxes[phaseType] = true;
   });
 
-  const convertToLabel = (startTime:Date, convertType:"daily"|"monthly") => {
+  const convertToLabel = (startTime:Date, buildNumber:number, convertType:"daily"|"monthly"|"none") => {
     if(convertType === "daily") {
       return convertDateToDayString(startTime);
-    } else if(convertType === "monthly") {
+    }
+    if(convertType === "monthly") {
       return convertDateToMonthString(startTime);
+    }
+    if(convertType === "none") {
+      return buildNumber.toString();
     }
   }
 
@@ -57,19 +61,25 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
   });
 
   const dailyLables   = unifyArray(
-    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "daily"))
+    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, entry.builds?.[0].buildNumber!, "daily"))
   ) as string[];
   const monthlyLables = unifyArray(
-    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, "monthly"))
+    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, entry.builds?.[0].buildNumber!, "monthly"))
+  ) as string[];
+  const noneLables    = unifyArray(
+    filteredCodebuildData.map((entry) => convertToLabel(entry.builds![0].startTime!, entry.builds?.[0].buildNumber!, "none"))
   ) as string[];
   const detectLabels = (groupingType:GroupingType) => {
     if(groupingType === "daily") {
       return dailyLables;
-    } else if(groupingType === "monthly") {
-      return monthlyLables;
-    } else {
+    }
+    if(groupingType === "monthly") {
       return monthlyLables;
     }
+    if(groupingType === "none") {
+      return noneLables;
+    }
+    return monthlyLables;
   };
 
   // console.log(labels);
@@ -86,7 +96,7 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
     // console.log({durations});
 
     return {
-      label: convertToLabel(entry.builds![0].startTime!, groupingTypeState),
+      label: convertToLabel(entry.builds![0].startTime!, entry.builds?.[0].buildNumber!, groupingTypeState),
       ...durations,
     };
   });
