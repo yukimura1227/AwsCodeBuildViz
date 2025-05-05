@@ -1,5 +1,12 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --watch main.ts",
+    "lint": "deno run -A npm:@biomejs/biome check",
+    "lint:fix": "deno run -A npm:@biomejs/biome check --apply",
+    "format": "deno run -A npm:@biomejs/biome format src",
+    "format:fix": "deno run -A npm:@biomejs/biome format --write"
+  },
+  "imports": {
+    "@biomejs/biome": "npm:@biomejs/biome@^1.9.4"
   }
 }
