@@ -1,4 +1,4 @@
-import { CodeBuildClient, BatchGetBuildsCommand, BatchGetBuildsCommandInput, BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
+import { CodeBuildClient, BatchGetBuildsCommand, type BatchGetBuildsCommandInput, type BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
 
 const createClient = (credentials:unknown, region:string):CodeBuildClient => {
   const client = new CodeBuildClient({
