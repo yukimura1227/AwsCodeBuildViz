@@ -60,7 +60,7 @@ settings.default.codebuildSettings.forEach( async (setting) => {
         [`${codeBuildProjectName}__detail-response`, buildId],
         { response },
       );
-      // rate limitに備えて0.1秒待つ
+      // rate limitに備えてwait
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       console.log('already exists');
