@@ -34,9 +34,9 @@ buildPhaseTypeStrings.map( (type) => {
 const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProjectName:string) => {
   const GROUPING_TYPES = ["daily", "monthly", "none"] as const;
   type GroupingType = typeof GROUPING_TYPES[number];
-  const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("monthly");
-  const [referenceDateFromState, setReferenceDateFromState] = useState("2024-01-01");
-  const [referenceDateToState, setReferenceDateToState] = useState(new Date().toISOString().slice(0,10));
+  const [groupingTypeState, setGroupingTypeState] = useState<GroupingType>("none");
+  const [referenceDateFromState, setReferenceDateFromState] = useState(convertDateToDayString(new Date()));
+  const [referenceDateToState, setReferenceDateToState] = useState(convertDateToDayString(new Date()));
 
   const initialCheckBoxes:{ [key in BuildPhaseTypeStringType]?: boolean} = {};
   buildPhaseTypeStrings.map((phaseType) => {
@@ -45,10 +45,10 @@ const Chart = (sortedCodebuildData: BatchGetBuildsCommandOutput[], codeBuildProj
 
   const convertToLabel = (startTime:Date, buildNumber:number, convertType:"daily"|"monthly"|"none") => {
     if(convertType === "daily") {
-      return convertDateToDayString(startTime);
+      return convertDateToDayString(new Date(startTime));
     }
     if(convertType === "monthly") {
-      return convertDateToMonthString(startTime);
+      return convertDateToMonthString(new Date(startTime));
     }
     if(convertType === "none") {
       return buildNumber.toString();
