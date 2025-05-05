@@ -70,7 +70,7 @@ settings.default.codebuildSettings.forEach( async (setting) => {
   const buildDetailEntries = kv.list<BatchGetBuildsCommandOutput>({prefix: [`${codeBuildProjectName}__detail-response`]})
   const buildDetailsArray:BatchGetBuildsCommandOutput[] = [];
   for await (const entry of buildDetailEntries) {
-    buildDetailsArray.push(entry.value.response);
+    if( entry.value.response?.builds[0]?.buildStatus === 'SUCCEEDED' ) buildDetailsArray.push(entry.value.response);
   }
   const buildDetailsArraySorted = buildDetailsArray.sort((a, b) => {
     if (a.builds && b.builds) {
