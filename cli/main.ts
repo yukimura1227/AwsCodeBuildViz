@@ -3,8 +3,8 @@ import { fromEnv, fromIni } from "npm:@aws-sdk/credential-providers";
 import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
 
-const localSettings = await import('../environment.local.json', { assert: { type: "json" } });
-const globalSettings = await import('../environment.json', { assert: { type: "json" } });
+const localSettings = await import('../environment.local.json', { with: { type: "json" } });
+const globalSettings = await import('../environment.json', { with: { type: "json" } });
 
 let settings: typeof globalSettings | typeof localSettings;
 if(localSettings) {

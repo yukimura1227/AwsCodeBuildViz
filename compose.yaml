@@ -1,6 +1,6 @@
 services:
   cli:
-    image: denoland/deno:1.41.2
+    image: denoland/deno:2.1.12
     volumes:
       - .:/usr/src/app
       - deno_node_modules_for_cli:/usr/src/app/cli/node_modules
@@ -11,7 +11,7 @@ services:
     working_dir: /usr/src/app/cli
     command: 'deno run --unstable-kv --allow-sys --allow-env --allow-read --allow-net --allow-write main.ts'
   viz:
-    image: denoland/deno:1.41.2
+    image: denoland/deno:2.1.12
     ports:
       - '5173:5173'
     volumes:
