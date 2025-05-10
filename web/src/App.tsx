@@ -65,8 +65,10 @@ const Chart = (
   ) => {
     if (convertType === 'daily') {
       return convertDateToDayString(new Date(startTime));
-    } else if (convertType === 'monthly') {
+    }
+    if (convertType === 'monthly') {
       return convertDateToMonthString(new Date(startTime));
+    }
     if(convertType === 'none') {
       return buildNumber.toString();
     }
