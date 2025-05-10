@@ -1,10 +1,10 @@
-import { BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
+import type { BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild";
+import { fromEnv, fromIni } from "npm:@aws-sdk/credential-providers";
 import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
-import { fromIni, fromEnv } from "npm:@aws-sdk/credential-providers";
 
-const localSettings = await import('../environment.local.json', { with: { type: "json" } });
-const globalSettings = await import('../environment.json', { with: { type: "json" } });
+const localSettings = await import('../environment.local.json', { assert: { type: "json" } });
+const globalSettings = await import('../environment.json', { assert: { type: "json" } });
 
 let settings: typeof globalSettings | typeof localSettings;
 if(localSettings) {
@@ -13,11 +13,11 @@ if(localSettings) {
   settings = globalSettings;
 }
 
-settings.default.codebuildSettings.forEach( async (setting) => {
+for (const setting of settings.default.codebuildSettings) {
   const codeBuildProjectName:string = setting.codeBuildProjectName;
   const region:string               = setting.region;
 
-  let credentials;
+  let credentials: unknown;
   if( setting.credentials.sso?.awsProfileName ) {
     const awsProfileName:string = setting.credentials.sso.awsProfileName;
     credentials = fromIni({ profile: awsProfileName });
@@ -82,4 +82,4 @@ settings.default.codebuildSettings.forEach( async (setting) => {
   await Deno.writeTextFile(`../codeBuildResult/${codeBuildProjectName}.json`, JSON.stringify(buildDetailsArraySorted), {
     append: false,
   });
-});
+};

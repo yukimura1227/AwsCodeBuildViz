@@ -87,7 +87,7 @@ button:focus-visible {
   padding: 0 .5rem;
   width: 12rem;
   height: 2rem;
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   box-sizing: border-box;
   font-size: 1rem;
   color: #999;
@@ -97,21 +97,21 @@ button:focus-visible {
   padding: 0 .5rem;
   width: 12rem;
   height: 2rem;
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   background: transparent;
   box-sizing: border-box;
   font-size: 1rem;
   color: #999;
 }
 
-.dateInput::-webkit-inner-spin-button{
+.dateInput::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
-.dateInput::-webkit-clear-button{
+.dateInput::-webkit-clear-button {
   -webkit-appearance: none;
 }
 
-.dateInpu::-webkit-calendar-picker-indicator{
+.dateInpu::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 0px;
   top: 0px;
