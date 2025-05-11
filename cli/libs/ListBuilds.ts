@@ -52,7 +52,7 @@ export const ListBuilds = async (
   codeBuildProjectName: string,
   region: string
 ): Promise<string[]> => {
-  const client = await createClient(credentials, region);
+  const client = createClient(credentials, region);
 
   console.log('実行開始');
   const buildIdsResult: string[] = [];
