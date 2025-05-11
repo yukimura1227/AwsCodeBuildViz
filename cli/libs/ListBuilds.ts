@@ -25,9 +25,9 @@ const listBuildsOnce = async (
   const nextNextToken = response.nextToken;
 
   console.log({ nextToken });
-  console.log({ length: response.ids.length });
+  console.log({ length: response.ids?.length });
 
-  for (const buildId of response.ids) {
+  for (const buildId of response.ids ?? []) {
     buildIdsResult.push(buildId);
   }
 
