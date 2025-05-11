@@ -47,14 +47,14 @@ for (const setting of settings.default.codebuildSettings) {
     );
   }
 
-  const entries = kv.list({ prefix: [codeBuildProjectName]});
+  const entries:Deno.KvListIterator<{codeBuildProjectName: string; buildId: string}> = kv.list({ prefix: [codeBuildProjectName]});
   for await (const entry of entries) {
     console.log(entry.key);
     console.log(entry.value);
-    const buildId:string = (entry.value as { buildId: string }).buildId;
+    const buildId:string = entry.value.buildId;
 
-    const buildDetailEntry:BatchGetBuildsCommandOutput = await kv.get([`${codeBuildProjectName}__detail-response`, buildId])
-    if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined || buildDetailEntry.value.response.response?.builds[0].buildStatus === 'IN_PROGRESS') {
+    const buildDetailEntry:Deno.KvEntryMaybe<{response: BatchGetBuildsCommandOutput}> = await kv.get([`${codeBuildProjectName}__detail-response`, buildId]);
+    if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined || buildDetailEntry.value.response?.builds?.[0].buildStatus === 'IN_PROGRESS') {
       console.log(`get build details: ${buildId}`);
       const response = await BatchGetBuilds(credentials, buildId, region);
       await kv.set(
@@ -68,10 +68,10 @@ for (const setting of settings.default.codebuildSettings) {
     }
   }
 
-  const buildDetailEntries = kv.list<BatchGetBuildsCommandOutput>({prefix: [`${codeBuildProjectName}__detail-response`]})
+  const buildDetailEntries = kv.list<{response: BatchGetBuildsCommandOutput}>({prefix: [`${codeBuildProjectName}__detail-response`]})
   const buildDetailsArray:BatchGetBuildsCommandOutput[] = [];
   for await (const entry of buildDetailEntries) {
-    if( entry.value.response?.builds[0]?.buildStatus === 'SUCCEEDED' ) buildDetailsArray.push(entry.value.response);
+    if( entry.value.response?.builds?.[0]?.buildStatus === 'SUCCEEDED' ) buildDetailsArray.push(entry.value.response);
   }
   const buildDetailsArraySorted = buildDetailsArray.sort((a, b) => {
     if (a.builds && b.builds) {
