@@ -14,7 +14,7 @@ const createClient = (credentials: unknown, region: string) => {
 };
 
 const listBuildsOnce = async (
-  client: unknown,
+  client: CodeBuildClient,
   buildIdsResult: string[],
   codeBuildProjectName: string,
   nextToken?: string
