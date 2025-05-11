@@ -47,18 +47,21 @@ for (const setting of settings.default.codebuildSettings) {
     );
   }
 
+  const detailResponseKey = (buildId:string) => { 
+    return [`${codeBuildProjectName}__detail-response`, buildId];
+  };
   const entries:Deno.KvListIterator<{codeBuildProjectName: string; buildId: string}> = kv.list({ prefix: [codeBuildProjectName]});
   for await (const entry of entries) {
     console.log(entry.key);
     console.log(entry.value);
     const buildId:string = entry.value.buildId;
 
-    const buildDetailEntry:Deno.KvEntryMaybe<{response: BatchGetBuildsCommandOutput}> = await kv.get([`${codeBuildProjectName}__detail-response`, buildId]);
+    const buildDetailEntry:Deno.KvEntryMaybe<{response: BatchGetBuildsCommandOutput}> = await kv.get(detailResponseKey(buildId));
     if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined || buildDetailEntry.value.response?.builds?.[0].buildStatus === 'IN_PROGRESS') {
       console.log(`get build details: ${buildId}`);
       const response = await BatchGetBuilds(credentials, buildId, region);
       await kv.set(
-        [`${codeBuildProjectName}__detail-response`, buildId],
+        detailResponseKey(buildId),
         { response },
       );
       // rate limitに備えてwait
@@ -68,7 +71,7 @@ for (const setting of settings.default.codebuildSettings) {
     }
   }
 
-  const buildDetailEntries = kv.list<{response: BatchGetBuildsCommandOutput}>({prefix: [`${codeBuildProjectName}__detail-response`]})
+  const buildDetailEntries = kv.list<{response: BatchGetBuildsCommandOutput}>({prefix: [detailResponseKey('dummy')[0]]})
   const buildDetailsArray:BatchGetBuildsCommandOutput[] = [];
   for await (const entry of buildDetailEntries) {
     if( entry.value.response?.builds?.[0]?.buildStatus === 'SUCCEEDED' ) buildDetailsArray.push(entry.value.response);
