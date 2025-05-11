@@ -1,18 +1,11 @@
 import {
-  CodeBuildClient,
+  type CodeBuildClient,
   ListBuildsForProjectCommand,
   type ListBuildsForProjectCommandInput,
   type ListBuildsForProjectCommandOutput,
 } from 'npm:@aws-sdk/client-codebuild';
+import { CreateCodeBuildClient } from "./CreateCodeBuildClient.ts";
 import type { AwsCredentialIdentityProvider } from "npm:@aws-sdk/types";
-
-const createClient = (credentials: AwsCredentialIdentityProvider, region: string) => {
-  const client = new CodeBuildClient({
-    region: region,
-    credentials: credentials,
-  });
-  return client;
-};
 
 const listBuildsOnce = async (
   client: CodeBuildClient,
@@ -49,11 +42,11 @@ const listBuildsOnce = async (
 };
 
 export const ListBuilds = async (
-  credentials: unknown,
+  credentials: AwsCredentialIdentityProvider,
   codeBuildProjectName: string,
   region: string
 ): Promise<string[]> => {
-  const client = createClient(credentials, region);
+  const client = CreateCodeBuildClient(credentials, region);
 
   console.log('実行開始');
   const buildIdsResult: string[] = [];
