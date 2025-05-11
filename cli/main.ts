@@ -2,6 +2,7 @@ import type { BatchGetBuildsCommandOutput } from "npm:@aws-sdk/client-codebuild"
 import { fromEnv, fromIni } from "npm:@aws-sdk/credential-providers";
 import { BatchGetBuilds } from "./libs/BatchGetBuilds.ts";
 import { ListBuilds } from "./libs/ListBuilds.ts";
+import type { AwsCredentialIdentityProvider } from "npm:@aws-sdk/types";
 
 const localSettings = await import('../environment.local.json', { with: { type: "json" } });
 const globalSettings = await import('../environment.json', { with: { type: "json" } });
@@ -17,7 +18,7 @@ for (const setting of settings.default.codebuildSettings) {
   const codeBuildProjectName:string = setting.codeBuildProjectName;
   const region:string               = setting.region;
 
-  let credentials: unknown;
+  let credentials: AwsCredentialIdentityProvider;
   if( setting.credentials.sso?.awsProfileName ) {
     const awsProfileName:string = setting.credentials.sso.awsProfileName;
     credentials = fromIni({ profile: awsProfileName });

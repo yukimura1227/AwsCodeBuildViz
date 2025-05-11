@@ -4,8 +4,9 @@ import {
   type ListBuildsForProjectCommandInput,
   type ListBuildsForProjectCommandOutput,
 } from 'npm:@aws-sdk/client-codebuild';
+import type { AwsCredentialIdentityProvider } from "npm:@aws-sdk/types";
 
-const createClient = (credentials: unknown, region: string) => {
+const createClient = (credentials: AwsCredentialIdentityProvider, region: string) => {
   const client = new CodeBuildClient({
     region: region,
     credentials: credentials,
