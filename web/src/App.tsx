@@ -45,8 +45,18 @@ const Chart = (
 ) => {
   const GROUPING_TYPES = ["daily", "monthly", "none"] as const;
   type GroupingType = (typeof GROUPING_TYPES)[number];
+  
+  const getDefaultGroupingFromQuery = (): GroupingType => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupParam = urlParams.get('group');
+    if (groupParam && GROUPING_TYPES.includes(groupParam as GroupingType)) {
+      return groupParam as GroupingType;
+    }
+    return 'monthly';
+  };
+  
   const [groupingTypeState, setGroupingTypeState] =
-    useState<GroupingType>('monthly');
+    useState<GroupingType>(getDefaultGroupingFromQuery());
   const [referenceDateFromState, setReferenceDateFromState] =
     useState(convertDateToDayString(new Date()));
   const [referenceDateToState, setReferenceDateToState] = useState(
