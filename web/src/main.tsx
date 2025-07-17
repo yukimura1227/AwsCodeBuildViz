@@ -3,15 +3,26 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App.tsx';
 import './index.css';
 
-const getGroupFromQuery = (): string | null => {
+const getQueryParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('group');
+  const dateFromParam = urlParams.get('dateFrom');
+  const dateToParam = urlParams.get('dateTo');
+  
+  return {
+    group: urlParams.get('group'),
+    dateFrom: dateFromParam ? new Date(dateFromParam) : undefined,
+    dateTo: dateToParam ? new Date(dateToParam) : undefined
+  };
 };
 
-const groupParam = getGroupFromQuery();
+const queryParams = getQueryParams();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App group={groupParam} />
+    <App 
+      group={queryParams.group} 
+      dateFrom={queryParams.dateFrom} 
+      dateTo={queryParams.dateTo} 
+    />
   </React.StrictMode>
 );

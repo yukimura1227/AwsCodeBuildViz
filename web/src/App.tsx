@@ -42,7 +42,9 @@ buildPhaseTypeStrings.map((type) => {
 const Chart = (
   sortedCodebuildData: BatchGetBuildsCommandOutput[],
   codeBuildProjectName: string,
-  initialGroup?: string
+  initialGroup?: string,
+  initialDateFrom?: Date,
+  initialDateTo?: Date
 ) => {
   const GROUPING_TYPES = ["daily", "monthly", "none"] as const;
   type GroupingType = (typeof GROUPING_TYPES)[number];
@@ -54,12 +56,20 @@ const Chart = (
     return 'monthly';
   };
   
+  const getDefaultDateFrom = (): string => {
+    return initialDateFrom ? convertDateToDayString(initialDateFrom) : convertDateToDayString(new Date());
+  };
+  
+  const getDefaultDateTo = (): string => {
+    return initialDateTo ? convertDateToDayString(initialDateTo) : convertDateToDayString(new Date());
+  };
+  
   const [groupingTypeState, setGroupingTypeState] =
     useState<GroupingType>(getDefaultGrouping());
   const [referenceDateFromState, setReferenceDateFromState] =
-    useState(convertDateToDayString(new Date()));
+    useState(getDefaultDateFrom());
   const [referenceDateToState, setReferenceDateToState] = useState(
-    convertDateToDayString(new Date())
+    getDefaultDateTo()
   );
 
   const initialCheckBoxes: { [key in BuildPhaseTypeStringType]?: boolean } = {};
@@ -278,9 +288,11 @@ await Promise.all(
 
 interface AppProps {
   group?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
-export const App = ({ group }: AppProps) => {
+export const App = ({ group, dateFrom, dateTo }: AppProps) => {
   return (
     <>
       {Object.keys(codeBuildResultJsons)
@@ -288,7 +300,7 @@ export const App = ({ group }: AppProps) => {
         .reverse() // TODO: implements sort function
         .map((key) => {
           // console.log(codeBuildResultJsons[key]);
-          return Chart(codeBuildResultJsons[key].buildResult, key, group);
+          return Chart(codeBuildResultJsons[key].buildResult, key, group, dateFrom, dateTo);
         })}
     </>
   );
