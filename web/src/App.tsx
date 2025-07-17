@@ -41,22 +41,21 @@ buildPhaseTypeStrings.map((type) => {
 
 const Chart = (
   sortedCodebuildData: BatchGetBuildsCommandOutput[],
-  codeBuildProjectName: string
+  codeBuildProjectName: string,
+  initialGroup?: string
 ) => {
   const GROUPING_TYPES = ["daily", "monthly", "none"] as const;
   type GroupingType = (typeof GROUPING_TYPES)[number];
   
-  const getDefaultGroupingFromQuery = (): GroupingType => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const groupParam = urlParams.get('group');
-    if (groupParam && GROUPING_TYPES.includes(groupParam as GroupingType)) {
-      return groupParam as GroupingType;
+  const getDefaultGrouping = (): GroupingType => {
+    if (initialGroup && GROUPING_TYPES.includes(initialGroup as GroupingType)) {
+      return initialGroup as GroupingType;
     }
     return 'monthly';
   };
   
   const [groupingTypeState, setGroupingTypeState] =
-    useState<GroupingType>(getDefaultGroupingFromQuery());
+    useState<GroupingType>(getDefaultGrouping());
   const [referenceDateFromState, setReferenceDateFromState] =
     useState(convertDateToDayString(new Date()));
   const [referenceDateToState, setReferenceDateToState] = useState(
@@ -277,7 +276,11 @@ await Promise.all(
   })
 );
 
-export const App = () => {
+interface AppProps {
+  group?: string;
+}
+
+export const App = ({ group }: AppProps) => {
   return (
     <>
       {Object.keys(codeBuildResultJsons)
@@ -285,7 +288,7 @@ export const App = () => {
         .reverse() // TODO: implements sort function
         .map((key) => {
           // console.log(codeBuildResultJsons[key]);
-          return Chart(codeBuildResultJsons[key].buildResult, key);
+          return Chart(codeBuildResultJsons[key].buildResult, key, group);
         })}
     </>
   );
