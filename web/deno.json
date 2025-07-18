@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "lib": ["dom", "deno.ns", "es2022"]
+  },
   "tasks": {
     "dev": "deno run -A --node-modules-dir npm:vite",
     "build": "deno run -A --node-modules-dir npm:vite build",
