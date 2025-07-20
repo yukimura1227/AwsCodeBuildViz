@@ -18,7 +18,7 @@ import {
   convertDateToDayString,
   convertDateToMonthString,
 } from './lib/DateUtils.ts';
-import { calculateAverage } from './lib/claculateAverage.ts';
+import { calculateAverage } from './lib/calculateAverage.ts';
 import { unifyArray } from './lib/unifyArray.ts';
 
 type BuildPhaseTypeStringType = (typeof buildPhaseTypeStrings)[0];
