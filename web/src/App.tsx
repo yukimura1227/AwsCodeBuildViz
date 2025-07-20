@@ -39,7 +39,7 @@ await Promise.all(
 
 export const App = ({ group, dateFrom, dateTo }: AppProps) => {
   return (
-    <>
+    <React.Fragment>
       {Object.keys(codeBuildResultJsons)
         .sort()
         .reverse() // TODO: implements sort function
@@ -47,6 +47,6 @@ export const App = ({ group, dateFrom, dateTo }: AppProps) => {
           // console.log(codeBuildResultJsons[key]);
           return Chart(codeBuildResultJsons[key].buildResult, key, group, dateFrom, dateTo);
         })}
-    </>
+    </React.Fragment>
   );
 };

@@ -203,7 +203,7 @@ export const Chart = (
   };
 
   return (
-    <>
+    <React.Fragment>
       <div className="filterControls">
         <label className="filterLabel">group by </label>
         <span className="">
@@ -243,7 +243,7 @@ export const Chart = (
         </span>
       </div>
       <Bar options={options} data={data} />
-    </>
+    </React.Fragment>
   );
 };
 
