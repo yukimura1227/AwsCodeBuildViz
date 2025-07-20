@@ -9,10 +9,10 @@ interface AppProps {
   dateTo?: Date;
 }
 
-const localSettings = await import('../../environment.local.json').then(
+const localSettings = await import('../../../../environment.local.json').then(
   (module) => module.default.codebuildSettings
 );
-const globalSettings = await import('../../environment.json').then(
+const globalSettings = await import('../../../../environment.json').then(
   (module) => module.default.codebuildSettings
 );
 
@@ -27,11 +27,11 @@ const codeBuildResultJsons: {
 
 await Promise.all(
   settings.map(async (setting) => {
-    console.log(`../codeBuildResult/${setting.codeBuildProjectName}.json`);
+    console.log(`../../../../codeBuildResult/${setting.codeBuildProjectName}.json`);
     codeBuildResultJsons[setting.codeBuildProjectName] = {
       setting,
       buildResult: await import(
-        `../../codeBuildResult/${setting.codeBuildProjectName}.json`
+        `../../../../codeBuildResult/${setting.codeBuildProjectName}.json`
       ).then((module) => module.default),
     };
   })

@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-
 import { BuildPhaseType } from '@aws-sdk/client-codebuild';
 import type { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import {
@@ -17,9 +16,9 @@ import { Bar } from 'react-chartjs-2';
 import {
   convertDateToDayString,
   convertDateToMonthString,
-} from './lib/DateUtils.ts';
-import { calculateAverage } from './lib/calculateAverage.ts';
-import { unifyArray } from './lib/unifyArray.ts';
+} from '../../lib/DateUtils.ts';
+import { calculateAverage } from '../../lib/calculateAverage.ts';
+import { unifyArray } from '../../lib/unifyArray.ts';
 
 type BuildPhaseTypeStringType = (typeof buildPhaseTypeStrings)[0];
 const buildPhaseTypeStrings = Object.values(BuildPhaseType);
