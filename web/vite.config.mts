@@ -10,4 +10,11 @@ export default defineConfig({
   server: {
     host: true
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'pages/index.html'),
+      },
+    },
+  },
 });
