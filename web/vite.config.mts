@@ -19,6 +19,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'pages/AverageTrendChart/index.html'),
+        timeline: resolve(__dirname, 'pages/Timeline/index.html'),
       },
     },
   },
