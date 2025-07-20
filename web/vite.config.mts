@@ -1,7 +1,12 @@
-import { defineConfig } from 'npm:vite@5.1.6';
+import { defineConfig } from 'npm:vite@5.4.19';
 import react from 'npm:@vitejs/plugin-react@^4.2.1';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
-import 'npm:react@^18.2.0';
+import 'npm:react-dom@^18.2.0';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import 'npm:react-dom@^18.2.0';
 
 // https://vitejs.dev/config/
