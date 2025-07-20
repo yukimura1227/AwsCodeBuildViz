@@ -6,6 +6,12 @@
 deno install --allow-scripts=npm:@biomejs/biome@2.1.2
 ```
 
+## Testing
+
+```shell
+deno test
+```
+
 ## Running
 
 You need to have Deno v1.28.0 or later installed to run this repo.
