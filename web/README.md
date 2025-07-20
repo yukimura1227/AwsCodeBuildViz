@@ -1,5 +1,11 @@
 # Vite + Deno + React + TypeScript
 
+## Setup
+
+```shell
+deno install --allow-scripts=npm:@biomejs/biome@2.1.2
+```
+
 ## Running
 
 You need to have Deno v1.28.0 or later installed to run this repo.
