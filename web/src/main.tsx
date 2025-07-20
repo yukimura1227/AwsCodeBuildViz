@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App.tsx';
 import './index.css';
 
-const getQueryParams = () => {
-  const urlParams = new URLSearchParams(window.location.search);
+const getQueryParams = (searchString: string) => {
+  const urlParams = new URLSearchParams(searchString);
   const dateFromParam = urlParams.get('dateFrom');
   const dateToParam = urlParams.get('dateTo');
   const groupParam =  urlParams.get('group');
@@ -16,7 +16,7 @@ const getQueryParams = () => {
   };
 };
 
-const queryParams = getQueryParams();
+const queryParams = getQueryParams(window.location.search);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
