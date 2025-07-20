@@ -121,12 +121,10 @@ export const Chart = (
     if (groupingType === 'daily') {
       return dailyLables;
     }
-    if(groupingType === "monthly") {
-      return monthlyLables;
-    }
     if(groupingType === "none") {
       return noneLables;
     }
+    return monthlyLables;
   };
 
   // console.log(labels);

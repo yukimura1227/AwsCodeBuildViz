@@ -7,9 +7,10 @@ const getQueryParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const dateFromParam = urlParams.get('dateFrom');
   const dateToParam = urlParams.get('dateTo');
-  
+  const groupParam =  urlParams.get('group');
+
   return {
-    group: urlParams.get('group'),
+    group: groupParam ? groupParam : undefined,
     dateFrom: dateFromParam ? new Date(dateFromParam) : undefined,
     dateTo: dateToParam ? new Date(dateToParam) : undefined
   };

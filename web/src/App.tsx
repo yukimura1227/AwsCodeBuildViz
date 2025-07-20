@@ -4,7 +4,7 @@ import type { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist
 import { Chart } from "./Chart.tsx";
 
 interface AppProps {
-  group?: string|null;
+  group?: string;
   dateFrom?: Date;
   dateTo?: Date;
 }

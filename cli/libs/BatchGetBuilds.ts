@@ -4,9 +4,9 @@ import {
   type BatchGetBuildsCommandOutput,
   CodeBuildClient,
 } from 'npm:@aws-sdk/client-codebuild';
-
+import type { AwsCredentialIdentity, AwsCredentialIdentityProvider } from 'npm:@aws-sdk/types';
 const createClient = (
-  credentials: unknown,
+  credentials: AwsCredentialIdentity | AwsCredentialIdentityProvider,
   region: string
 ): CodeBuildClient => {
   const client = new CodeBuildClient({
@@ -19,7 +19,7 @@ const createClient = (
 const getButchBuild = async (
   client: CodeBuildClient,
   buildId: string
-): BatchGetBuildsCommandOutput => {
+): Promise<BatchGetBuildsCommandOutput> => {
   const input: BatchGetBuildsCommandInput = {
     ids: [buildId],
   };
@@ -33,7 +33,7 @@ const getButchBuild = async (
 };
 
 export const BatchGetBuilds = async (
-  credentials: unknown,
+  credentials: AwsCredentialIdentity | AwsCredentialIdentityProvider,
   buildId: string,
   region: string
 ) => {
