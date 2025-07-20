@@ -16,7 +16,7 @@ const getQueryParams = (searchString: string) => {
   };
 };
 
-const queryParams = getQueryParams(window.location.search);
+const queryParams = getQueryParams(globalThis.location.search);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
