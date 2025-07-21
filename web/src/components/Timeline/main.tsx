@@ -3,35 +3,11 @@ import ReactDOM from 'react-dom/client';
 import { TimelineChart } from './TimelineChart.tsx';
 import type { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { convertDateToDayString } from "../../lib/DateUtils.ts";
+import { loadCodeBuildResults } from "../../lib/loadCodeBuildData.ts";
 import '../index.css';
 
-// Load CodeBuild data (similar to App.tsx)
-const localSettings = await import('../../../../environment.local.json').then(
-  (module) => module.default.codebuildSettings
-);
-const globalSettings = await import('../../../../environment.json').then(
-  (module) => module.default.codebuildSettings
-);
-
-const settings = localSettings ? localSettings : globalSettings;
-
-const codeBuildResultJsons: {
-  [key: string]: {
-    setting: (typeof settings)[0];
-    buildResult: BatchGetBuildsCommandOutput[];
-  };
-} = {};
-
-await Promise.all(
-  settings.map(async (setting) => {
-    codeBuildResultJsons[setting.codeBuildProjectName] = {
-      setting,
-      buildResult: await import(
-        `../../../../codeBuildResult/${setting.codeBuildProjectName}.json`
-      ).then((module) => module.default),
-    };
-  })
-);
+// Load CodeBuild data using shared function
+const codeBuildResultJsons = await loadCodeBuildResults();
 
 const App = () => {
   const [referenceDate, setReferenceDate] = React.useState(new Date()); 
