@@ -34,17 +34,17 @@ await Promise.all(
 );
 
 const App = () => {
-  const [targetDate, setTargetDate] = React.useState(new Date()); 
+  const [referenceDate, setReferenceDate] = React.useState(new Date()); 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTargetDate(new Date(event.target.value));
+    setReferenceDate(new Date(event.target.value));
   };
 
   const filterCodeBuildResults = (results: BatchGetBuildsCommandOutput[]) => {
     return results.filter((result) => {
       const startTime = new Date(result.builds![0].startTime!);
       return (
-        startTime >= new Date(`${convertDateToDayString(targetDate)}T00:00:00.000Z`) &&
-        startTime <= new Date(`${convertDateToDayString(targetDate)}T23:59:59.999Z`)
+        startTime >= new Date(`${convertDateToDayString(referenceDate)}T00:00:00.000Z`) &&
+        startTime <= new Date(`${convertDateToDayString(referenceDate)}T23:59:59.999Z`)
       );
     });
   };
@@ -55,7 +55,7 @@ const App = () => {
         <span className="dateInputWrap">
           <input
             type="date"
-            value={targetDate.toISOString().split('T')[0]}
+            value={referenceDate.toISOString().split('T')[0]}
             onChange={handleDateChange}
           />
         </span>
