@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App.tsx';
-import './index.css';
+import '../index.css';
 
 const getQueryParams = (urlParams: URLSearchParams) => {
   const dateFromParam = urlParams.get('dateFrom');

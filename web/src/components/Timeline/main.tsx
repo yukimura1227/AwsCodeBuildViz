@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { TimelineChart } from './TimelineChart.tsx';
 import type { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { convertDateToDayString } from "../../lib/DateUtils.ts";
+import '../index.css';
 
 // Load CodeBuild data (similar to App.tsx)
 const localSettings = await import('../../../../environment.local.json').then(
@@ -50,11 +51,14 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <input
-        type="date"
-        value={targetDate.toISOString().split('T')[0]}
-        onChange={handleDateChange}
-      />
+        <label className="filterLabel">ReferenceDate </label>
+        <span className="dateInputWrap">
+          <input
+            type="date"
+            value={targetDate.toISOString().split('T')[0]}
+            onChange={handleDateChange}
+          />
+        </span>
       {Object.keys(codeBuildResultJsons)
         .sort()
         .reverse()
