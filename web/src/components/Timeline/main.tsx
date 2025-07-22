@@ -1,13 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { TimelineChart } from './TimelineChart.tsx';
-import type { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import { convertDateToDayString } from "../../lib/DateUtils.ts";
-import { loadCodeBuildResults } from "../../lib/loadCodeBuildData.ts";
+import { type codeBuildResult, loadCodeBuildResults } from "../../lib/loadCodeBuildData.ts";
 import '../index.css';
 
 // Load CodeBuild data using shared function
-const codeBuildResultJsons = await loadCodeBuildResults();
+const codeBuildResultJsons = loadCodeBuildResults();
 
 const App = () => {
   const [referenceDate, setReferenceDate] = React.useState(new Date()); 
@@ -15,7 +14,7 @@ const App = () => {
     setReferenceDate(new Date(event.target.value));
   };
 
-  const filterCodeBuildResults = (results: BatchGetBuildsCommandOutput[]) => {
+  const filterCodeBuildResults = (results: codeBuildResult[]) => {
     return results.filter((result) => {
       const startTime = new Date(result.builds![0].startTime!);
       return (
@@ -42,7 +41,7 @@ const App = () => {
           return (
             <TimelineChart
               key={key}
-              codeBuildResults={filterCodeBuildResults(codeBuildResultJsons[key].buildResult)}
+              codeBuildResults={filterCodeBuildResults(codeBuildResultJsons[key].buildResults!)}
               codeBuildProjectName={key}
             />
           );

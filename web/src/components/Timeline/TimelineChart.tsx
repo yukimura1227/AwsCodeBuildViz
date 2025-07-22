@@ -12,8 +12,8 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { secondsSinceStartOfDay } from "../../lib/DateUtils.ts";
-import { BatchGetBuildsCommandOutput } from "@aws-sdk/client-codebuild";
 import 'chartjs-adapter-date-fns';
+import { type codeBuildResult } from "../../lib/loadCodeBuildData.ts";
 
 ChartJS.register(
   CategoryScale,
@@ -26,12 +26,11 @@ ChartJS.register(
 );
 
 interface TimelineChartProps {
-  codeBuildResults: BatchGetBuildsCommandOutput[];
+  codeBuildResults: codeBuildResult[];
   codeBuildProjectName: string;
 }
 
 export const TimelineChart = ({ codeBuildResults, codeBuildProjectName }: TimelineChartProps) => {
-  console.log({ codeBuildResults, codeBuildProjectName });
   const options:ChartOptions<'bar'> = {
     indexAxis: 'y' as const,
     elements: {

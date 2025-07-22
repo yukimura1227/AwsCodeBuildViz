@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import { BuildPhaseType } from '@aws-sdk/client-codebuild';
-import type { BatchGetBuildsCommandOutput } from '@aws-sdk/client-codebuild/dist-types/commands/BatchGetBuildsCommand';
 import {
   BarElement,
   CategoryScale,
@@ -19,6 +18,7 @@ import {
 } from '../../lib/DateUtils.ts';
 import { calculateAverage } from '../../lib/calculateAverage.ts';
 import { unifyArray } from '../../lib/unifyArray.ts';
+import { codeBuildResult } from "../../lib/loadCodeBuildData.ts";
 
 type BuildPhaseTypeStringType = (typeof buildPhaseTypeStrings)[0];
 const buildPhaseTypeStrings = Object.values(BuildPhaseType);
@@ -39,7 +39,7 @@ buildPhaseTypeStrings.map((type) => {
 });
 
 export const Chart = (
-  sortedCodebuildData: BatchGetBuildsCommandOutput[],
+  sortedCodebuildData: codeBuildResult[],
   codeBuildProjectName: string,
   initialGroup?: string,
   initialDateFrom?: Date,
@@ -126,8 +126,6 @@ export const Chart = (
     return monthlyLables;
   };
 
-  // console.log(labels);
-
   const codeBuildLabelAndDurations = filteredCodebuildData.map((entry) => {
     const durations: { [key in BuildPhaseTypeStringType]?: number } = {};
     buildPhaseTypeStrings.map((phaseType) => {
@@ -139,14 +137,12 @@ export const Chart = (
         ? buildPhase.durationInSeconds
         : 0;
     });
-    // console.log({durations});
 
     return {
       label: convertToLabel(entry.builds![0].startTime!, entry.builds?.[0].buildNumber!, groupingTypeState),
       ...durations,
     };
   });
-  // console.log({codeBuildLabelAndDurations});
 
   const codeBuildDurations = (target: BuildPhaseTypeStringType) => {
     return detectLabels(groupingTypeState).map((label) => {

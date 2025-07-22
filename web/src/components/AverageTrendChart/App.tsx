@@ -10,7 +10,7 @@ interface AppProps {
 }
 
 // Load CodeBuild data using shared function
-const codeBuildResultJsons = await loadCodeBuildResults();
+const codeBuildResultJsons = loadCodeBuildResults();
 
 export const App = ({ group, dateFrom, dateTo }: AppProps) => {
   return (
@@ -19,8 +19,7 @@ export const App = ({ group, dateFrom, dateTo }: AppProps) => {
         .sort()
         .reverse() // TODO: implements sort function
         .map((key) => {
-          // console.log(codeBuildResultJsons[key]);
-          return Chart(codeBuildResultJsons[key].buildResult, key, group, dateFrom, dateTo);
+          return Chart(codeBuildResultJsons[key].buildResults!, key, group, dateFrom, dateTo);
         })}
     </React.Fragment>
   );
