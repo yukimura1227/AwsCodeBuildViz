@@ -57,7 +57,7 @@ for (const setting of settings.default.codebuildSettings) {
     const buildId:string = entry.value.buildId;
 
     const buildDetailEntry:Deno.KvEntryMaybe<{response: BatchGetBuildsCommandOutput}> = await kv.get(detailResponseKey(buildId));
-    if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined || buildDetailEntry.value.response?.builds?.[0].buildStatus === 'IN_PROGRESS') {
+    if( buildDetailEntry.value === null || buildDetailEntry.value.response === undefined || buildDetailEntry.value.response?.builds?.[0]?.buildStatus === 'IN_PROGRESS') {
       console.log(`get build details: ${buildId}`);
       const response = await BatchGetBuilds(credentials, buildId, region);
       await kv.set(
